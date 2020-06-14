@@ -23,7 +23,7 @@ void ActorGraph::addActor(Actor* newActor)
 	actorList.push_back(newActor);
 }
 
-void Actorgraph::syncActors()
+void ActorGraph::syncActors()
 {
 	;
 }
