@@ -25,8 +25,8 @@ void ActorGraph::addActor(Actor* newActor)
 
 void ActorGraph::syncActors()
 {
-	for(auto it = actorList.begin(), it != actorList.end(); ++it)
+	for(auto it = actorList.begin(); it != actorList.end(); ++it)
 	{
-		gaspi_printf("Actor name %s of %d\n", (it->name).c_str(), it->rank);
+		gaspi_printf("Actor name %s of %d\n", (it->first).c_str(), it->second);
 	}
 }
