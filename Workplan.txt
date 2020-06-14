@@ -1,0 +1,5 @@
+ActorGraph
+-local actorgraphs
+-store references to actors
+-make connections
+-iterate through actors
