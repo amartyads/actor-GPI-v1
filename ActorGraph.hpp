@@ -14,4 +14,5 @@ public:
 	ActorGraph();
 	void addActor(Actor* newActor);
 	void syncActors();
+	void printActors();
 };

@@ -23,10 +23,15 @@ void ActorGraph::addActor(Actor* newActor)
 	actorList.push_back(newActor);
 }
 
-void ActorGraph::syncActors()
+void Actorgraph::syncActors()
+{
+	;
+}
+
+void ActorGraph::printActors()
 {
 	for(int i = 0; i < actorList.size(); i++)
 	{
-		gaspi_printf("Actor name %s of %d\n", (*actorList[i]).name.c_str(), actorList[i]->rank);
+		gaspi_printf("Actor name %s of %d, address %p\n", (*actorList[i]).name.c_str(), actorList[i]->rank, (void *)actorList[i]);
 	}
 }
