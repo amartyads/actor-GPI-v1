@@ -1,10 +1,9 @@
-#ifndef ACTORGPI_UTILS_HPP
-#define ACTORGPI_UTILS_HPP
-
 
 #include "../local/include/GASPI.h"
 #include "../local/include/GASPI_Ext.h"
 #include <stdlib.h>
+
+#pragma once
 
 namespace gpi_util
 {
@@ -35,5 +34,3 @@ namespace gpi_util
 }
 
 
-
-#endif
