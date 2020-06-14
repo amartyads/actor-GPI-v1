@@ -1,12 +1,9 @@
 #include "../local/include/GASPI.h"
 #include "../local/include/GASPI_Ext.h"
+#include "gpi-utils.hpp"
 #include "Actor.hpp"
 #include "ActorGraph.hpp"
 #include <stdlib.h>
-
-#ifndef ACTORGPI_UTILS_HPP
-#include "gpi-utils.hpp"
-#endif
 
 #ifndef ASSERT
 #define ASSERT(ec) gpi_util::success_or_exit(__FILE__,__LINE__,ec)
@@ -28,5 +25,8 @@ void ActorGraph::addActor(Actor* newActor)
 
 void ActorGraph::syncActors()
 {
-	gaspi_printf("Hello from ran %d of %d\n", rank, num);
+	for(auto it = actorList.begin(), it != actorList.end(); ++it)
+	{
+		gaspi_printf("Actor name %s of %d\n", (it->name).c_str(), it->rank);
+	}
 }

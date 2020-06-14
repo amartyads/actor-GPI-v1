@@ -21,6 +21,9 @@ int main(int argc, char *argv[])
 	ASSERT( gaspi_proc_rank(&rank));
 	ASSERT( gaspi_proc_num(&num) );
 
+	Actor *localActor = new Actor("A-"+std::to_string(rank),rank);
+	ag.addActor(localActor);
+
 	ag.syncActors();
 
 
