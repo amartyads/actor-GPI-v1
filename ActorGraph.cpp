@@ -85,7 +85,7 @@ void ActorGraph::syncActors()
 
 	int segmentCtr = 3;
 	//for each other rank
-	for(int i = 0; i < num, i++)
+	for(int i = 0; i < num; i++)
 	{
 		if(i == rank)
 			continue;
@@ -98,9 +98,9 @@ void ActorGraph::syncActors()
                          )
              );
 		//create pointer for receiving actors
-		gaspi_size_t segment_size_rem_arr = arrayPtrSize * (*remSize);
+		gaspi_size_t segment_size_rem_arr = actorPtrSize * (*remSize);
 		//create segment for receiving actors
-		gaspi_segment_id_t segment_id_rem_array = ctr++;
+		gaspi_segment_id_t segment_id_rem_array = segmentCtr++;
 		ASSERT (gaspi_segment_create(segment_id_rem_array, segment_size_rem_arr
                                , GASPI_GROUP_ALL, GASPI_BLOCK
                                , GASPI_ALLOC_DEFAULT
@@ -111,7 +111,7 @@ void ActorGraph::syncActors()
 		ASSERT (gaspi_segment_ptr (segment_id_rem_array, &gasptr_remote_array));
 		Actor** remote_array = (Actor **)(gasptr_remote_array);
 		//read in segment
-		ASSERT (gaspi_read ( segment_id_rem_arr, 0
+		ASSERT (gaspi_read ( segment_id_rem_array, 0
                          , rank, segment_id_loc_array, 0
                          , segment_size_rem_arr, queue_id_data, GASPI_BLOCK
                          )
