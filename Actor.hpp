@@ -1,5 +1,3 @@
-#include "../local/include/GASPI.h"
-#include "../local/include/GASPI_Ext.h"
 #include <stdlib.h>
 
 #include <string>

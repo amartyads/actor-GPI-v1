@@ -1,9 +1,12 @@
 #include "../local/include/GASPI.h"
 #include "../local/include/GASPI_Ext.h"
-#include "gpi-utils.hpp"
 #include "Actor.hpp"
 #include "ActorGraph.hpp"
 #include <stdlib.h>
+
+#ifndef ACTORGPI_UTILS_HPP
+#include "gpi-utils.hpp"
+#endif
 
 #ifndef ASSERT
 #define ASSERT(ec) gpi_util::success_or_exit(__FILE__,__LINE__,ec)
