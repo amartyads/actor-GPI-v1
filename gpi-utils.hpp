@@ -8,7 +8,7 @@
 
 namespace gpi_util
 {
-	void success_or_exit(const char* file, const int line, const int ec)
+	static void success_or_exit(const char* file, const int line, const int ec)
 	{
 		if(ec!=GASPI_SUCCESS)
 		{
@@ -16,7 +16,7 @@ namespace gpi_util
 			exit(EXIT_FAILURE);
 		}
 	}
-	void wait_if_queue_full ( const gaspi_queue_id_t queue_id
+	static void wait_if_queue_full ( const gaspi_queue_id_t queue_id
                         , const gaspi_number_t request_size
                         )
 	{
