@@ -24,6 +24,7 @@ int main(int argc, char *argv[])
 	Actor *localActor = new Actor("A-"+std::to_string(rank),rank);
 	ag.addActor(localActor);
 
+	ag.syncActors();
 	ag.printActors();
 
 
