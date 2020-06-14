@@ -2,6 +2,7 @@
 #include "../local/include/GASPI_Ext.h"
 #include "gpi-utils.hpp"
 #include "Actor.hpp"
+#include "ActorGraph.hpp"
 #include <stdlib.h>
 
 #ifndef ASSERT

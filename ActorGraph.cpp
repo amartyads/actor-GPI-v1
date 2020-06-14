@@ -2,6 +2,7 @@
 #include "../local/include/GASPI_Ext.h"
 #include "gpi-utils.hpp"
 #include "Actor.hpp"
+#include "ActorGraph.hpp"
 #include <stdlib.h>
 
 #ifndef ASSERT
@@ -10,16 +11,6 @@
 
 #include <string>
 #include <vector>
-
-class ActorGraph
-{
-public:
-	std::vector<Actor* > actorList;
-	gaspi_rank_t rank, num;
-	ActorGraph();
-	void addActor(Actor* newActor);
-	void syncActors();
-};
 
 ActorGraph::ActorGraph()
 {
