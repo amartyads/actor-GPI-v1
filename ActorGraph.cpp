@@ -15,9 +15,16 @@ class ActorGraph
 {
 public:
 	vector<Actor* > actorList;
-	ActorGraph(){}
+	gaspi_rank_t rank, num;
+	ActorGraph();
 	void addActor(Actor* newActor);
 	void syncActors();
+}
+
+ActorGraph::ActorGraph()
+{
+	ASSERT( gaspi_proc_rank(&rank));
+	ASSERT( gaspi_proc_num(&num) );
 }
 
 void ActorGraph::addActor(Actor* newActor)
@@ -27,9 +34,5 @@ void ActorGraph::addActor(Actor* newActor)
 
 void ActorGraph::syncActors()
 {
-	gaspi_rank_t rank, num;
-	ASSERT( gaspi_proc_rank(&rank));
-	ASSERT( gaspi_proc_num(&num) );
-
 	gaspi_printf("Hello from ran %d of %d\n", rank, num);
 }

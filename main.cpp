@@ -15,9 +15,14 @@ int main(int argc, char *argv[])
 
 	ASSERT( gaspi_proc_init(GASPI_BLOCK) );
 
+	ActorGraph ag = new ActorGraph();
+
 	ASSERT( gaspi_proc_rank(&rank));
 	ASSERT( gaspi_proc_num(&num) );
-	gaspi_printf("Hello from ran %d of %d\n", rank, num);
+
+	ag.syncActors();
+
+
 
 	ASSERT( gaspi_proc_term(GASPI_BLOCK) );
 
