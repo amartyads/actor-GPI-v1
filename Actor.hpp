@@ -12,9 +12,9 @@ class Actor
 public:
 	std::string name;
 	int rank;
-	Actor(std:string othname, int othrank)
+	Actor(std::string othname, int othrank)
 	{
 		name = othname;
 		rank = othrank;
 	}
-}
+};

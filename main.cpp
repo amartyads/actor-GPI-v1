@@ -4,7 +4,7 @@
 #include "Actor.hpp"
 #include <stdlib.h>
 
-#ifndef ASSERT(ec)
+#ifndef ASSERT
 #define ASSERT(ec) gpi_util::success_or_exit(__FILE__,__LINE__,ec)
 #endif
 

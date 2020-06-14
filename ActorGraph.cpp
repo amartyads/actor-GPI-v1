@@ -4,7 +4,7 @@
 #include "Actor.hpp"
 #include <stdlib.h>
 
-#ifndef ASSERT(ec)
+#ifndef ASSERT
 #define ASSERT(ec) gpi_util::success_or_exit(__FILE__,__LINE__,ec)
 #endif
 
@@ -14,12 +14,12 @@
 class ActorGraph
 {
 public:
-	vector<Actor* > actorList;
+	std::vector<Actor* > actorList;
 	gaspi_rank_t rank, num;
 	ActorGraph();
 	void addActor(Actor* newActor);
 	void syncActors();
-}
+};
 
 ActorGraph::ActorGraph()
 {
