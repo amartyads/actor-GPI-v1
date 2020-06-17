@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <utility>
 
 #include <string>
 
@@ -19,4 +20,7 @@ public:
 		globID = (rank << 10) | srno;
 	}
 	Actor(int srno, int rank) : Actor("A-"+std::to_string(rank)+"-"+std::to_string(srno), srno, rank) { }
+
+	static int encodeGlobID(int actNo, int procNo);
+	static std::pair<int,int> decodeGlobID(int inpGlobId);
 };
