@@ -147,7 +147,7 @@ void ActorGraph::printActors()
 	{
 		gaspi_printf("Local actor name %s of %d, address %p\n", (*localActorRefList[i]).name.c_str(), localActorRefList[i]->rank, (void *)localActorRefList[i]);
 	}
-	for(int i = 0; i <nonLocalActorRefList.size(); i++)
+	for(int i = 0; i <nonLocalActorIDList.size(); i++)
 	{
 		gaspi_printf("Non local actor reference ID %d\n", nonLocalActorIDList[i]);
 	}
