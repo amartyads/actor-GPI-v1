@@ -27,7 +27,7 @@ void ActorGraph::addActor(Actor* newActor)
 void ActorGraph::syncActors()
 {
 	int actorElemSize = sizeof(int);
-	int remoteNoActors[num];
+	//int remoteNoActors[num];
 
 	const gaspi_queue_id_t queue_id_size = 0;
 	const gaspi_queue_id_t queue_id_data = 1;
@@ -42,7 +42,7 @@ void ActorGraph::syncActors()
                                , GASPI_ALLOC_DEFAULT
                                )
          );
- 	ASSERT (gaspi_segment_create(segment_id_rem_size, sizeof(int)
+ 	ASSERT (gaspi_segment_create(segment_id_rem_size, (num * sizeof(int))
                                , GASPI_GROUP_ALL, GASPI_BLOCK
                                , GASPI_ALLOC_DEFAULT
                                )
@@ -57,10 +57,10 @@ void ActorGraph::syncActors()
 	const gaspi_queue_id_t queue_id = 0;
 	 
 	int *locSize = (int *)(srcgasp);
-	int *remSize = (int *)(dstgasp);
+	int *remoteNoActors = (int *)(dstgasp);
 
 	*locSize = localActorRefList.size();
-	int maxSize = *locSize;
+	//int maxSize = *locSize;
 
 	//segment for local actors
 	const gaspi_segment_id_t segment_id_loc_array = 2;
@@ -89,21 +89,21 @@ void ActorGraph::syncActors()
 			continue;
 		//read no of actors
 		gpi_util::wait_if_queue_full (queue_id_size, 1);
- 
-      	ASSERT (gaspi_read ( segment_id_rem_size, 0
+ 		
+ 		const gaspi_offset_t offset_dst = i * sizeof (int);
+      	ASSERT (gaspi_read ( segment_id_rem_size, offset_dst
                          , rank, segment_id_loc_size, 0
                          , sizeof (int), queue_id_size, GASPI_BLOCK
                          )
              );
-      	maxSize = maxSize > *remSize? maxSize: *remSize;
-      	remoteNoActors[i] = *remSize;
-      	gaspi_printf("Read size: %d\n", *remSize);
+      	//maxSize = maxSize > *remSize? maxSize: *remSize;
+      	//remoteNoActors[i] = *remSize;
+      	//gaspi_printf("Read size: %d\n", *remSize);
     }
 
 
 
 	ASSERT (gaspi_barrier (GASPI_GROUP_ALL, GASPI_BLOCK));
-
 
 	//create pointer for receiving actors
 	gaspi_size_t segment_size_rem_arr = actorElemSize * maxSize;
