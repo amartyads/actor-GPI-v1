@@ -24,6 +24,9 @@ int main(int argc, char *argv[])
 	Actor *localActor = new Actor(0,rank);
 	ag.addActor(localActor);
 
+
+	ASSERT (gaspi_barrier (GASPI_GROUP_ALL, GASPI_BLOCK));
+	
 	ag.syncActors();
 	ag.printActors();
 

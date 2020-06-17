@@ -149,7 +149,7 @@ void ActorGraph::printActors()
 {
 	for(int i = 0; i <localActorRefList.size(); i++)
 	{
-		gaspi_printf("Local actor name %s of %d, address %p\n", (*localActorRefList[i]).name.c_str(), localActorRefList[i]->rank, (void *)localActorRefList[i]);
+		gaspi_printf("Local actor name %s of %d, ID \n", (*localActorRefList[i]).name.c_str(), localActorRefList[i]->rank, localActorRefList[i]->globID);
 	}
 	gaspi_printf("No of actors received: %d\n", nonLocalActorIDList.size());
 	for(int i = 0; i <nonLocalActorIDList.size(); i++)
