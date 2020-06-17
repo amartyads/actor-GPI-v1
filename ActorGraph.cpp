@@ -20,16 +20,14 @@ ActorGraph::ActorGraph()
 
 void ActorGraph::addActor(Actor* newActor)
 {
-	actorList.push_back(newActor);
+	localActorRefList.push_back(newActor);
+	localActorIDList.push_back(newActor->globID);
 }
 
 void ActorGraph::syncActors()
 {
-	int actorPtrSize = 0;
-	if(actorList.empty())
-		actorPtrSize = sizeof(new Actor("temp",99));
-	else
-		actorPtrSize = sizeof(actorList[0]);
+	int actorElemSize = sizeof(int);
+	int remoteNoActors[num];
 
 	const gaspi_queue_id_t queue_id_size = 0;
 	const gaspi_queue_id_t queue_id_data = 1;
@@ -61,12 +59,13 @@ void ActorGraph::syncActors()
 	int *locSize = (int *)(srcgasp);
 	int *remSize = (int *)(dstgasp);
 
-	*locSize = actorList.size();
+	*locSize = localActorRefList.size();
+	int maxSize = *locSize;
 
 	//segment for local actors
 	const gaspi_segment_id_t segment_id_loc_array = 2;
 
-	const gaspi_size_t segment_size_arr = sizeof(actorList); // arrayPtrSize * (*locSize)
+	const gaspi_size_t segment_size_arr = actorElemSize * (*locSize);
 
 	ASSERT (gaspi_segment_create(segment_id_loc_array, segment_size_arr
                                , GASPI_GROUP_ALL, GASPI_BLOCK
@@ -76,58 +75,80 @@ void ActorGraph::syncActors()
 
 	gaspi_pointer_t gasptr_local_array;
 	ASSERT (gaspi_segment_ptr (segment_id_loc_array, &gasptr_local_array));
-	Actor** local_array = (Actor **)(gasptr_local_array);
+	int *local_array = (int*)(gasptr_local_array);
 
 	for(int i = 0; i < *locSize; i++)
-		local_array[i] = actorList[i];
+		local_array[i] = localActorIDList[i];
 
 	ASSERT (gaspi_barrier (GASPI_GROUP_ALL, GASPI_BLOCK));
 
-	int segmentCtr = 3;
 	//for each other rank
 	for(int i = 0; i < num; i++)
 	{
-		if(i == rank)
+		if(i+1 == rank)
 			continue;
 		//read no of actors
-		gpi_util::wait_if_queue_full (queue_id, 1);
+		gpi_util::wait_if_queue_full (queue_id_size, 1);
  
       	ASSERT (gaspi_read ( segment_id_rem_size, 0
                          , rank, segment_id_loc_size, 0
                          , sizeof (int), queue_id_size, GASPI_BLOCK
                          )
              );
-		//create pointer for receiving actors
-		gaspi_size_t segment_size_rem_arr = actorPtrSize * (*remSize);
-		//create segment for receiving actors
-		gaspi_segment_id_t segment_id_rem_array = segmentCtr++;
-		ASSERT (gaspi_segment_create(segment_id_rem_array, segment_size_rem_arr
-                               , GASPI_GROUP_ALL, GASPI_BLOCK
-                               , GASPI_ALLOC_DEFAULT
-                               )
-         );
+      	maxSize = maxSize > *remSize? maxSize: *remSize;
+      	remoteNoActors[i] = *remSize;
+    }
 
-		gaspi_pointer_t gasptr_remote_array;
-		ASSERT (gaspi_segment_ptr (segment_id_rem_array, &gasptr_remote_array));
-		Actor** remote_array = (Actor **)(gasptr_remote_array);
-		//read in segment
+
+
+
+
+	//create pointer for receiving actors
+	gaspi_size_t segment_size_rem_arr = actorElemSize * maxSize;
+	//create segment for receiving actors
+	const gaspi_segment_id_t segment_id_rem_array = 3;
+	ASSERT (gaspi_segment_create(segment_id_rem_array, segment_size_rem_arr
+                           , GASPI_GROUP_ALL, GASPI_BLOCK
+                           , GASPI_ALLOC_DEFAULT
+                           )
+     );
+
+	gaspi_pointer_t gasptr_remote_array;
+	ASSERT (gaspi_segment_ptr (segment_id_rem_array, &gasptr_remote_array));
+	int* remote_array = (int*)(gasptr_remote_array);
+
+
+	//read in segment
+	for(int i = 0; i < num; i++)
+	{
+		if(i+1 == rank)
+			continue;
+
+		const gaspi_size_t segment_size_cur_rem_arr = actorElemSize * remoteNoActors[i];
+
+		gpi_util::wait_if_queue_full (queue_id_data, 1);
 		ASSERT (gaspi_read ( segment_id_rem_array, 0
-                         , rank, segment_id_loc_array, 0
-                         , segment_size_rem_arr, queue_id_data, GASPI_BLOCK
-                         )
-             );
+	                     , rank, segment_id_loc_array, 0
+	                     , segment_size_cur_rem_arr, queue_id_data, GASPI_BLOCK
+	                     )
+	         );
 		//use segmentPointer and push back actors
-		for(int j = 0; j < *remSize; j++)
+		for(int j = 0; j < remoteNoActors[i]; j++)
 		{
-			actorList.push_back(remote_array[i]);
+			nonLocalActorIDList.push_back(remote_array[i]);
 		}
 	}
+
 }
 
 void ActorGraph::printActors()
 {
-	for(int i = 0; i < actorList.size(); i++)
+	for(int i = 0; i <localActorRefList.size(); i++)
 	{
-		gaspi_printf("Actor name %s of %d, address %p\n", (*actorList[i]).name.c_str(), actorList[i]->rank, (void *)actorList[i]);
+		gaspi_printf("Local actor name %s of %d, address %p\n", (*localActorRefList[i]).name.c_str(), localActorRefList[i]->rank, (void *)localActorRefList[i]);
+	}
+	for(int i = 0; i <nonLocalActorRefList.size(); i++)
+	{
+		gaspi_printf("Non local actor reference ID %d\n", nonLocalActorIDList[i]);
 	}
 }
