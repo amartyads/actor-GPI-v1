@@ -100,7 +100,8 @@ void ActorGraph::syncActors()
     }
 
 
-
+    
+	ASSERT (gaspi_barrier (GASPI_GROUP_ALL, GASPI_BLOCK));
 
 
 	//create pointer for receiving actors
@@ -138,6 +139,8 @@ void ActorGraph::syncActors()
 			nonLocalActorIDList.push_back(remote_array[i]);
 		}
 	}
+	
+	ASSERT (gaspi_barrier (GASPI_GROUP_ALL, GASPI_BLOCK));
 
 }
 
