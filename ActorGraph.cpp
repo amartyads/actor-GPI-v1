@@ -184,6 +184,8 @@ void ActorGraph::printActors()
 	gaspi_printf("No of actors received: %d\n", nonLocalActorIDList.size());
 	for(int i = 0; i <nonLocalActorIDList.size(); i++)
 	{
-		gaspi_printf("Non local actor reference ID %d\n", nonLocalActorIDList[i]);
+		pair<int, int> temp = Actor::decodeGlobID(nonLocalActorIDList[i]);
+
+		gaspi_printf("Non local actor no %d of rank %d \n", temp.first, temp.second);
 	}
 }
