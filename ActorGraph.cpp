@@ -102,8 +102,9 @@ void ActorGraph::syncActors()
     }
 
 
+	ASSERT (gaspi_wait (queue_id_size, GASPI_BLOCK));
 
-	ASSERT (gaspi_barrier (GASPI_GROUP_ALL, GASPI_BLOCK));
+	//ASSERT (gaspi_barrier (GASPI_GROUP_ALL, GASPI_BLOCK));
 
 	/*int maxSize = *locSize;
 	for(int i = 0; i < num; i++)
@@ -163,13 +164,15 @@ void ActorGraph::syncActors()
 
 		
 	}
+	ASSERT (gaspi_wait (queue_id_data, GASPI_BLOCK));
 
-	ASSERT (gaspi_barrier (GASPI_GROUP_ALL, GASPI_BLOCK));
 	//use segmentPointer and push back actors
 	for(int j = 0; j < (segSize/actorElemSize); j++)
 	{
 		nonLocalActorIDList.push_back(remote_array[j]);
 	}
+
+	ASSERT (gaspi_barrier (GASPI_GROUP_ALL, GASPI_BLOCK));
 }
 
 void ActorGraph::printActors()
