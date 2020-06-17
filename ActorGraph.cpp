@@ -186,6 +186,6 @@ void ActorGraph::printActors()
 	{
 		std::pair<int, int> temp = Actor::decodeGlobID(nonLocalActorIDList[i]);
 
-		gaspi_printf("Non local actor no %d of rank %d \n", temp.first, temp.second);
+		gaspi_printf("Non local actor ID %d no %d of rank %d \n", nonLocalActorIDList[i],temp.first, temp.second);
 	}
 }
