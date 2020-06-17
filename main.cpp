@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
 	ASSERT( gaspi_proc_num(&num) );
 
 	Actor *localActor1 = new Actor(0,rank);
-	ag.addActor(localActor);
+	ag.addActor(localActor1);
 	Actor *localActor2 = new Actor(1,rank);
 	ag.addActor(localActor2);
 	Actor *localActor3 = new Actor(2,rank);
