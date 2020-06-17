@@ -105,8 +105,13 @@ void ActorGraph::syncActors()
 
 	ASSERT (gaspi_barrier (GASPI_GROUP_ALL, GASPI_BLOCK));
 
-	int maxSize = std::max_element(remoteNoActors, remoteNoActors + num);
-	
+	int maxSize = *locSize;
+	for(int i = 0; i < num; i++)
+	{
+		if(i == rank)
+			continue;
+		maxSize = maxSize > remoteNoActors[i]? maxSize: remoteNoActors[i];
+	}
 	//create pointer for receiving actors
 	gaspi_size_t segment_size_rem_arr = actorElemSize * maxSize;
 	//create segment for receiving actors
