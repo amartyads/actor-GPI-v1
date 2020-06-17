@@ -92,7 +92,7 @@ void ActorGraph::syncActors()
  		
  		const gaspi_offset_t offset_dst = i * sizeof (int);
       	ASSERT (gaspi_read ( segment_id_rem_size, offset_dst
-                         , rank, segment_id_loc_size, 0
+                         , i, segment_id_loc_size, 0
                          , sizeof (int), queue_id_size, GASPI_BLOCK
                          )
              );
@@ -105,7 +105,7 @@ void ActorGraph::syncActors()
 
 	ASSERT (gaspi_barrier (GASPI_GROUP_ALL, GASPI_BLOCK));
 
-	int maxSize = *locSize;
+	/*int maxSize = *locSize;
 	for(int i = 0; i < num; i++)
 	{
 		if(i == rank)
@@ -120,13 +120,30 @@ void ActorGraph::syncActors()
                            , GASPI_GROUP_ALL, GASPI_BLOCK
                            , GASPI_ALLOC_DEFAULT
                            )
+     );*/
+
+	int segSize = 0;
+	for(int i = 0; i < num; i++)
+	{
+		if(i == rank)
+			continue;
+		segSize += remoteNoActors[i] * actorElemSize;
+	}
+
+	gaspi_size_t segment_size_rem_arr = segSize;
+	//create segment for receiving actors
+	const gaspi_segment_id_t segment_id_rem_array = 3;
+	ASSERT (gaspi_segment_create(segment_id_rem_array, segSize
+                           , GASPI_GROUP_ALL, GASPI_BLOCK
+                           , GASPI_ALLOC_DEFAULT
+                           )
      );
 
 	gaspi_pointer_t gasptr_remote_array;
 	ASSERT (gaspi_segment_ptr (segment_id_rem_array, &gasptr_remote_array));
 	int* remote_array = (int*)(gasptr_remote_array);
 
-
+	int localOffset = 0;
 	//read in segment
 	for(int i = 0; i < num; i++)
 	{
@@ -134,22 +151,25 @@ void ActorGraph::syncActors()
 			continue;
 
 		const gaspi_size_t segment_size_cur_rem_arr = actorElemSize * remoteNoActors[i];
+		const gaspi_offset_t loc_segment_offset = localOffset;
 
 		gpi_util::wait_if_queue_full (queue_id_data, 1);
-		ASSERT (gaspi_read ( segment_id_rem_array, 0
-	                     , rank, segment_id_loc_array, 0
+		ASSERT (gaspi_read ( segment_id_rem_array, loc_segment_offset
+	                     , i, segment_id_loc_array, 0
 	                     , segment_size_cur_rem_arr, queue_id_data, GASPI_BLOCK
 	                     )
 	         );
-		//use segmentPointer and push back actors
-		for(int j = 0; j < remoteNoActors[i]; j++)
-		{
-			nonLocalActorIDList.push_back(remote_array[i]);
-		}
+		localOffset += actorElemSize * remoteNoActors[i];
+
+		
 	}
 
 	ASSERT (gaspi_barrier (GASPI_GROUP_ALL, GASPI_BLOCK));
-
+	//use segmentPointer and push back actors
+	for(int j = 0; j < segSize; j++)
+	{
+		nonLocalActorIDList.push_back(remote_array[j]);
+	}
 }
 
 void ActorGraph::printActors()
