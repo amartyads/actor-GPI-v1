@@ -166,7 +166,7 @@ void ActorGraph::syncActors()
 
 	ASSERT (gaspi_barrier (GASPI_GROUP_ALL, GASPI_BLOCK));
 	//use segmentPointer and push back actors
-	for(int j = 0; j < segSize; j++)
+	for(int j = 0; j < (segSize/actorElemSize); j++)
 	{
 		nonLocalActorIDList.push_back(remote_array[j]);
 	}
