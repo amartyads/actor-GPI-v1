@@ -21,12 +21,16 @@ int main(int argc, char *argv[])
 	ASSERT( gaspi_proc_rank(&rank));
 	ASSERT( gaspi_proc_num(&num) );
 
-	Actor *localActor = new Actor(0,rank);
+	Actor *localActor1 = new Actor(0,rank);
 	ag.addActor(localActor);
+	Actor *localActor2 = new Actor(1,rank);
+	ag.addActor(localActor2);
+	Actor *localActor3 = new Actor(2,rank);
+	ag.addActor(localActor3);
 
 
 	ASSERT (gaspi_barrier (GASPI_GROUP_ALL, GASPI_BLOCK));
-	
+
 	ag.syncActors();
 	ag.printActors();
 
