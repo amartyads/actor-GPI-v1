@@ -100,7 +100,7 @@ void ActorGraph::syncActors()
     }
 
 
-    
+
 	ASSERT (gaspi_barrier (GASPI_GROUP_ALL, GASPI_BLOCK));
 
 
@@ -139,7 +139,7 @@ void ActorGraph::syncActors()
 			nonLocalActorIDList.push_back(remote_array[i]);
 		}
 	}
-	
+
 	ASSERT (gaspi_barrier (GASPI_GROUP_ALL, GASPI_BLOCK));
 
 }
@@ -150,6 +150,7 @@ void ActorGraph::printActors()
 	{
 		gaspi_printf("Local actor name %s of %d, address %p\n", (*localActorRefList[i]).name.c_str(), localActorRefList[i]->rank, (void *)localActorRefList[i]);
 	}
+	gaspi_printf("No of actors received: %d\n", nonLocalActorIDList.size());
 	for(int i = 0; i <nonLocalActorIDList.size(); i++)
 	{
 		gaspi_printf("Non local actor reference ID %d\n", nonLocalActorIDList[i]);
