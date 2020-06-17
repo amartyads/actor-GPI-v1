@@ -97,6 +97,7 @@ void ActorGraph::syncActors()
              );
       	maxSize = maxSize > *remSize? maxSize: *remSize;
       	remoteNoActors[i] = *remSize;
+      	gaspi_printf("Read size: %d\n", *remSize;
     }
 
 
