@@ -85,7 +85,7 @@ void ActorGraph::syncActors()
 	//for each other rank
 	for(int i = 0; i < num; i++)
 	{
-		if(i+1 == rank)
+		if(i == rank)
 			continue;
 		//read no of actors
 		gpi_util::wait_if_queue_full (queue_id_size, 1);
@@ -123,7 +123,7 @@ void ActorGraph::syncActors()
 	//read in segment
 	for(int i = 0; i < num; i++)
 	{
-		if(i+1 == rank)
+		if(i == rank)
 			continue;
 
 		const gaspi_size_t segment_size_cur_rem_arr = actorElemSize * remoteNoActors[i];
