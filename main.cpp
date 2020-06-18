@@ -23,10 +23,10 @@ int main(int argc, char *argv[])
 
 	Actor *localActor1 = new Actor(0,rank);
 	ag.addActor(localActor1);
-	Actor *localActor2 = new Actor(1,rank);
-	ag.addActor(localActor2);
-	Actor *localActor3 = new Actor(2,rank);
-	ag.addActor(localActor3);
+	//Actor *localActor2 = new Actor(1,rank);
+	//ag.addActor(localActor2);
+	//Actor *localActor3 = new Actor(2,rank);
+	//ag.addActor(localActor3);
 
 
 	ASSERT (gaspi_barrier (GASPI_GROUP_ALL, GASPI_BLOCK));
@@ -34,7 +34,11 @@ int main(int argc, char *argv[])
 	ag.syncActors();
 	ag.printActors();
 
-
+	Actor* temp = ag.getLocalActor(Actor::encodeGlobID(0,0));
+	if(temp->name == "Not found")
+		gaspi_printf("Actor not found on rank %d\n",rank);
+	else
+		gaspi_printf("Actor found on rank %d\n",rank);
 
 	ASSERT( gaspi_proc_term(GASPI_BLOCK) );
 
