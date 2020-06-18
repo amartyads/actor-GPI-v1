@@ -189,3 +189,21 @@ void ActorGraph::printActors()
 		gaspi_printf("Non local actor ID %d no %d of rank %d \n", nonLocalActorIDList[i],temp.first, temp.second);
 	}
 }
+Actor* ActorGraph::getLocalActor(int globID)
+{
+	for(int i = 0; i < localActorRefList.size(); i++)
+	{
+		if(localActorRefList[i]->globID == globID)
+			return localActorRefList[i];
+	}
+	return (new Actor("Not found",0,0));
+}
+Actor* ActorGraph::getLocalActor(std::string actName)
+{
+	for(int i = 0; i < localActorRefList.size(); i++)
+	{
+		if(localActorRefList[i]->name == actName)
+			return localActorRefList[i];
+	}
+	return (new Actor("Not found",0,0));
+}

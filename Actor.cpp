@@ -4,7 +4,7 @@
 #include <string>
 #include <utility>
 
-int Actor::encodeGlobID(int actNo, int procNo) //static
+int Actor::encodeGlobID(int procNo, int actNo) //static
 {
 	return (procNo << 10) | actNo;
 }
