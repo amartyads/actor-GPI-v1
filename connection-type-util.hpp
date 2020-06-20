@@ -1,3 +1,8 @@
+#ifndef ACTORCONNECT_UTILS_HPP
+#define ACTORCONNECT_UTILS_HPP
+
+#pragma once
+
 enum class ActorConnectionType
 {
     LOCAL_LOCAL,
@@ -5,4 +10,6 @@ enum class ActorConnectionType
     REMOTE_LOCAL,
     REMOTE_REMOTE,
     ACTOR_DNE,
-}
+};
+
+#endif
