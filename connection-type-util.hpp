@@ -4,4 +4,5 @@ enum class ConnectionType
     LOCAL_REMOTE,
     REMOTE_LOCAL,
     REMOTE_REMOTE,
+    ACTOR_DNE,
 }

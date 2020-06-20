@@ -20,6 +20,7 @@ public:
 	bool isLocalActor(int globID);
 	bool isLocalActor(std::string actName);
 	bool isRemoteActor(int globID);
+	bool isRegisteredActor(int globID);
 
 	ConnectionType getConnectionType(int globIDSrcActor, int globIDDestActor);
 

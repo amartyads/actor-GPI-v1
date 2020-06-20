@@ -21,10 +21,10 @@ int main(int argc, char *argv[])
 	ASSERT( gaspi_proc_rank(&rank));
 	ASSERT( gaspi_proc_num(&num) );
 
-	Actor *localActor1 = new Actor(0,rank);
+	Actor *localActor1 = new Actor(rank,0);
 	ag.addActor(localActor1);
-	//Actor *localActor2 = new Actor(1,rank);
-	//ag.addActor(localActor2);
+	Actor *localActor2 = new Actor(rank,1);
+	ag.addActor(localActor2);
 	//Actor *localActor3 = new Actor(2,rank);
 	//ag.addActor(localActor3);
 
@@ -33,12 +33,26 @@ int main(int argc, char *argv[])
 
 	ag.syncActors();
 	ag.printActors();
+	if (rank == 0)
+	{
+		int g1 = Actor::encodeGlobID(0,0);
+		int g2 = Actor::encodeGlobID(0,1);
+		int g3 = Actor::encodeGlobID(1,0);
+		int g4 = Actor::encodeGlobID(1,1);
 
-	Actor* temp = ag.getLocalActor(Actor::encodeGlobID(0,0));
-	if(temp->name == "Not found")
-		gaspi_printf("Actor not found on rank %d\n",rank);
-	else
-		gaspi_printf("Actor found on rank %d\n",rank);
+
+
+		int n1 = static_cast<int>(g1,g2);
+		int n2 = static_cast<int>(g1,g3);
+		int n3 = static_cast<int>(g3,g1);
+		int n4 = static_cast<int>(g3,g4);
+
+		gaspi_printf("Connection type %d - %d : %d \n", g1,g2,n1);
+		gaspi_printf("Connection type %d - %d : %d \n", g1,g3,n2);
+		gaspi_printf("Connection type %d - %d : %d \n", g3,g1,n3);
+		gaspi_printf("Connection type %d - %d : %d \n", g3,g4,n4);
+	}
+	
 
 	ASSERT( gaspi_proc_term(GASPI_BLOCK) );
 

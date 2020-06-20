@@ -222,14 +222,23 @@ bool ActorGraph::isLocalActor(std::string actName)
 }
 bool ActorGraph::isRemoteActor(int globID)
 {
-	for(int i = 0; i < remoteActorIDList; i++)
+	for(int i = 0; i < remoteActorIDList.size(); i++)
 	{
-		
+		if(globID == remoteActorIDList[i])
+			return true;
 	}
+	return false;
+}
+bool ActorGraph::isRegisteredActor(int globID)
+{
+	return (isLocalActor(globID) || isRemoteActor(globID));
 }
 
 ConnectionType ActorGraph::getConnectionType(int globIDSrcActor, int globIDDestActor)
 {
+	if(!isRegisteredActor(globIDSrcActor) || !isRegisteredActor(globIDDestActor))
+		return ConnectionType::ACTOR_DNE;
+	
 	bool srcLoc = isLocalActor(globIDSrcActor);
 	bool destLoc = isLocalActor(globIDDestActor);
 	if(srcLoc && destLoc)
