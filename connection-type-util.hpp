@@ -1,4 +1,4 @@
-enum class ConnectionType
+enum class ActorConnectionType
 {
     LOCAL_LOCAL,
     LOCAL_REMOTE,

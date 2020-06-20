@@ -22,7 +22,7 @@ public:
 	bool isRemoteActor(int globID);
 	bool isRegisteredActor(int globID);
 
-	ConnectionType getConnectionType(int globIDSrcActor, int globIDDestActor);
+	ActorConnectionType getActorConnectionType(int globIDSrcActor, int globIDDestActor);
 
 	gaspi_rank_t rank, num;
 	ActorGraph();

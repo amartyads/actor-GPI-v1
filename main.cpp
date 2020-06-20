@@ -41,11 +41,10 @@ int main(int argc, char *argv[])
 		int g4 = Actor::encodeGlobID(1,1);
 
 
-
-		int n1 = static_cast<int>(g1,g2);
-		int n2 = static_cast<int>(g1,g3);
-		int n3 = static_cast<int>(g3,g1);
-		int n4 = static_cast<int>(g3,g4);
+		int n1 = static_cast<int>ag.getActorConnectionType(g1,g2);
+		int n2 = static_cast<int>ag.getActorConnectionType(g1,g3);
+		int n3 = static_cast<int>ag.getActorConnectionType(g3,g1);
+		int n4 = static_cast<int>ag.getActorConnectionType(g3,g4);
 
 		gaspi_printf("Connection type %d - %d : %d \n", g1,g2,n1);
 		gaspi_printf("Connection type %d - %d : %d \n", g1,g3,n2);

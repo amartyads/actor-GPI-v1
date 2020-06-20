@@ -234,19 +234,19 @@ bool ActorGraph::isRegisteredActor(int globID)
 	return (isLocalActor(globID) || isRemoteActor(globID));
 }
 
-ConnectionType ActorGraph::getConnectionType(int globIDSrcActor, int globIDDestActor)
+ActorConnectionType ActorGraph::getActorConnectionType(int globIDSrcActor, int globIDDestActor)
 {
 	if(!isRegisteredActor(globIDSrcActor) || !isRegisteredActor(globIDDestActor))
-		return ConnectionType::ACTOR_DNE;
+		return ActorConnectionType::ACTOR_DNE;
 	
 	bool srcLoc = isLocalActor(globIDSrcActor);
 	bool destLoc = isLocalActor(globIDDestActor);
 	if(srcLoc && destLoc)
-		return ConnectionType::LOCAL_LOCAL;
+		return ActorConnectionType::LOCAL_LOCAL;
 	else if(srcLoc && !destLoc)
-		return ConnectionType::LOCAL_REMOTE;
+		return ActorConnectionType::LOCAL_REMOTE;
 	else if(!srcLoc && destLoc)
-		return ConnectionType::REMOTE_LOCAL;
+		return ActorConnectionType::REMOTE_LOCAL;
 	else
-		return ConnectionType::REMOTE_REMOTE;
+		return ActorConnectionType::REMOTE_REMOTE;
 }
