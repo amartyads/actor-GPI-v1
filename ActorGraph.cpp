@@ -1,6 +1,7 @@
 #include "../local/include/GASPI.h"
 #include "../local/include/GASPI_Ext.h"
 #include "gpi-utils.hpp"
+#include "connection-type-util.hpp"
 #include "Actor.hpp"
 #include "ActorGraph.hpp"
 #include <stdlib.h>
@@ -206,4 +207,16 @@ Actor* ActorGraph::getLocalActor(std::string actName)
 			return localActorRefList[i];
 	}
 	return (new Actor("Not found",0,0));
+}
+bool ActorGraph::isLocalActor(int globID)
+{
+	if(getLocalActor(globID)->name == "Not found")
+		return false;
+	return true;
+}
+bool ActorGraph::isLocalActor(std::string actName)
+{
+	if(getLocalActor(actName)->name == "Not found")
+		return false;
+	return true;
 }

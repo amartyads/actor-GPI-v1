@@ -1,4 +1,5 @@
 #include "Actor.hpp"
+#include "connection-type-util.hpp"
 #include <stdlib.h>
 
 #pragma once
@@ -15,6 +16,9 @@ public:
 
 	Actor* getLocalActor(int globID);
 	Actor* getLocalActor(std::string actName);
+
+	bool isLocalActor(int globID);
+	bool isLocalActor(std::string actName);
 
 	gaspi_rank_t rank, num;
 	ActorGraph();
