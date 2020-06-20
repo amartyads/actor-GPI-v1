@@ -12,13 +12,16 @@ class ActorGraph
 public:
 	std::vector<Actor* > localActorRefList;
 	std::vector<int> localActorIDList;
-	std::vector<int> nonLocalActorIDList;
+	std::vector<int> remoteActorIDList;
 
 	Actor* getLocalActor(int globID);
 	Actor* getLocalActor(std::string actName);
 
 	bool isLocalActor(int globID);
 	bool isLocalActor(std::string actName);
+	bool isRemoteActor(int globID);
+
+	ConnectionType getConnectionType(int globIDSrcActor, int globIDDestActor);
 
 	gaspi_rank_t rank, num;
 	ActorGraph();

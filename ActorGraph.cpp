@@ -170,7 +170,7 @@ void ActorGraph::syncActors()
 	//use segmentPointer and push back actors
 	for(int j = 0; j < (segSize/actorElemSize); j++)
 	{
-		nonLocalActorIDList.push_back(remote_array[j]);
+		remoteActorIDList.push_back(remote_array[j]);
 	}
 
 	ASSERT (gaspi_barrier (GASPI_GROUP_ALL, GASPI_BLOCK));
@@ -182,12 +182,12 @@ void ActorGraph::printActors()
 	{
 		gaspi_printf("Local actor name %s of %d, ID %d\n", (*localActorRefList[i]).name.c_str(), localActorRefList[i]->rank, localActorRefList[i]->globID);
 	}
-	gaspi_printf("No of actors received: %d\n", nonLocalActorIDList.size());
-	for(int i = 0; i <nonLocalActorIDList.size(); i++)
+	gaspi_printf("No of actors received: %d\n", remoteActorIDList.size());
+	for(int i = 0; i <remoteActorIDList.size(); i++)
 	{
-		std::pair<int, int> temp = Actor::decodeGlobID(nonLocalActorIDList[i]);
+		std::pair<int, int> temp = Actor::decodeGlobID(remoteActorIDList[i]);
 
-		gaspi_printf("Non local actor ID %d no %d of rank %d \n", nonLocalActorIDList[i],temp.first, temp.second);
+		gaspi_printf("Non local actor ID %d no %d of rank %d \n", remoteActorIDList[i],temp.first, temp.second);
 	}
 }
 Actor* ActorGraph::getLocalActor(int globID)
@@ -219,4 +219,25 @@ bool ActorGraph::isLocalActor(std::string actName)
 	if(getLocalActor(actName)->name == "Not found")
 		return false;
 	return true;
+}
+bool ActorGraph::isRemoteActor(int globID)
+{
+	for(int i = 0; i < remoteActorIDList; i++)
+	{
+		
+	}
+}
+
+ConnectionType ActorGraph::getConnectionType(int globIDSrcActor, int globIDDestActor)
+{
+	bool srcLoc = isLocalActor(globIDSrcActor);
+	bool destLoc = isLocalActor(globIDDestActor);
+	if(srcLoc && destLoc)
+		return ConnectionType::LOCAL_LOCAL;
+	else if(srcLoc && !destLoc)
+		return ConnectionType::LOCAL_REMOTE;
+	else if(!srcLoc && destLoc)
+		return ConnectionType::REMOTE_LOCAL;
+	else
+		return ConnectionType::REMOTE_REMOTE;
 }
