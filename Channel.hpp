@@ -9,8 +9,8 @@ class Channel
 public:
     ActorConnectionType currConnectionType;
 
-    virtual void pushData();
-    virtual void pullData();
+    virtual void pushData() = 0;
+    virtual void pullData() = 0;
 };
 
 #endif

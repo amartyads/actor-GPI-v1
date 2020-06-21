@@ -20,6 +20,7 @@ public:
 	int rank;
 	int srno;
 	int globID;
+	int noTimesRan;
 
 	std::vector<InPort* > inPortList;
 	std::vector<OutPort* > outPortList;
@@ -33,6 +34,7 @@ public:
 		rank = othrank;
 		srno = othsrno;
 		globID = (rank << 10) | srno;
+		noTimesRan = 0;
 	}
 	Actor(int rank, int srno) : Actor("A-"+std::to_string(rank)+"-"+std::to_string(srno), rank, srno) { }
 

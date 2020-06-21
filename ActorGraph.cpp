@@ -6,6 +6,8 @@
 #include "ActorGraph.hpp"
 #include "InPort.hpp"
 #include "OutPort.hpp"
+#include "Channel.hpp"
+#include "LocalChannel.hpp"
 #include <stdlib.h>
 #include <algorithm>
 
@@ -288,7 +290,14 @@ void ActorGraph::makeConnections()
 				Actor* ac1 = getLocalActor(connectionList[i].first);
 				Actor* ac2 = getLocalActor(connectionList[i].second);
 				//establish channel
+				Channel* channel = new LocalChannel(ActorConnectionType::LOCAL_LOCAL);
 				//make ports
+				InPort* inPort = new InPort(channel);
+				OutPort* outPort = new OutPort(channel);
+
+				ac1->addOutPort(outPort);
+				ac2->addInPort(inPort);
+				
 				break;
 			}
 			case ActorConnectionType::LOCAL_REMOTE:
