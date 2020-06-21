@@ -5,6 +5,7 @@
 #include "Actor.hpp"
 #include "ActorGraph.hpp"
 #include <stdlib.h>
+#include <algorithm>
 
 #ifndef ASSERT
 #define ASSERT(ec) gpi_util::success_or_exit(__FILE__,__LINE__,ec)
@@ -251,12 +252,43 @@ ActorConnectionType ActorGraph::getActorConnectionType(int globIDSrcActor, int g
 		return ActorConnectionType::REMOTE_REMOTE;
 }
 
-ActorConnectionType ActorGraph::getActorConnectionType(std::pair<int, int> curPair)
+ActorConnectionType ActorGraph::getActorConnectionType(std::pair<int, int> *curPair)
 {
-	return getActorConnectionType(curPair.first, curPair.second);
+	return getActorConnectionType(curPair->first, curPair->second);
 }
 
 void ActorGraph::pushConnection(int srcGlobID, int destGlobID)
 {
-	connectionList.push_back(std::pair<int,int>(srcGlobID, destGlobID));
+	connectionList.push_back(std::make_pair(srcGlobID, destGlobID));
+}
+
+void ActorGraph::makeConnections()
+{
+	std::sort(connectionList.begin(), connectionList.end());
+
+	std::vector<ActorConnectionType> connectionTypeList;
+
+	for(int i = 0; i < connectionList.size(); i++)
+	{
+		connectionTypeList.push_back(getActorConnectionType(connectionList[i]));
+	}
+	//count no of remote connections
+	//communicate requirements
+	//distribute among queue_max no of queues
+
+	for(int i = 0; i < connectionList.size(); i++)
+	{
+		switch(connectionTypeList[i])
+		{
+			case ActorConnectionType::LOCAL_LOCAL:
+				break;
+			case ActorConnectionType::LOCAL_REMOTE:
+				break;
+			case ActorConnectionType::REMOTE_LOCAL:
+				break;
+			case ActorConnectionType::REMOTE_REMOTE:
+				//do nothing
+				break;
+		}
+	}
 }

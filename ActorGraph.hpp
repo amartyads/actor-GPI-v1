@@ -27,8 +27,9 @@ public:
 
 
 	ActorConnectionType getActorConnectionType(int globIDSrcActor, int globIDDestActor);
-	ActorConnectionType getActorConnectionType(std::pair<int, int> curPair);
+	ActorConnectionType getActorConnectionType(std::pair<int, int> *curPair);
 	void pushConnection(int srcGlobID, int destGlobID);
+	void makeConnections();
 
 	gaspi_rank_t rank, num;
 	ActorGraph();
