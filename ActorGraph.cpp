@@ -250,3 +250,13 @@ ActorConnectionType ActorGraph::getActorConnectionType(int globIDSrcActor, int g
 	else
 		return ActorConnectionType::REMOTE_REMOTE;
 }
+
+ActorConnectionType ActorGraph::getActorConnectionType(std::pair<int, int> curPair)
+{
+	return getActorConnectionType(curPair.first, curPair.second);
+}
+
+void ActorGraph::pushConnection(int srcGlobID, int destGlobID)
+{
+	connectionList.push_back(std::pair<int,int>(srcGlobID, destGlobID));
+}

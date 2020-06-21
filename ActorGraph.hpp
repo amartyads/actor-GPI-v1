@@ -1,6 +1,7 @@
 #include "Actor.hpp"
 #include "connection-type-util.hpp"
 #include <stdlib.h>
+#include <utility>
 
 #pragma once
 
@@ -14,6 +15,8 @@ public:
 	std::vector<int> localActorIDList;
 	std::vector<int> remoteActorIDList;
 
+	std::vector<std::pair<int, int> > connectionList;
+	
 	Actor* getLocalActor(int globID);
 	Actor* getLocalActor(std::string actName);
 
@@ -22,7 +25,10 @@ public:
 	bool isRemoteActor(int globID);
 	bool isRegisteredActor(int globID);
 
+
 	ActorConnectionType getActorConnectionType(int globIDSrcActor, int globIDDestActor);
+	ActorConnectionType getActorConnectionType(std::pair<int, int> curPair);
+	void pushConnection(int srcGlobID, int destGlobID);
 
 	gaspi_rank_t rank, num;
 	ActorGraph();
