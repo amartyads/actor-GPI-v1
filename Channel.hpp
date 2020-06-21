@@ -1,3 +1,8 @@
+#ifndef CHANNEL_HPP
+#define CHANNEL_HPP
+
+#pragma once
+
 #include "connection-type-util.hpp"
 class Channel
 {
@@ -7,3 +12,5 @@ public:
     virtual void pushData();
     virtual void pullData();
 };
+
+#endif

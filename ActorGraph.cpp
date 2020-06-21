@@ -4,6 +4,8 @@
 #include "connection-type-util.hpp"
 #include "Actor.hpp"
 #include "ActorGraph.hpp"
+#include "InPort.hpp"
+#include "OutPort.hpp"
 #include <stdlib.h>
 #include <algorithm>
 
@@ -252,9 +254,9 @@ ActorConnectionType ActorGraph::getActorConnectionType(int globIDSrcActor, int g
 		return ActorConnectionType::REMOTE_REMOTE;
 }
 
-ActorConnectionType ActorGraph::getActorConnectionType(std::pair<int, int> *curPair)
+ActorConnectionType ActorGraph::getActorConnectionType(std::pair<int, int> curPair)
 {
-	return getActorConnectionType(curPair->first, curPair->second);
+	return getActorConnectionType(curPair.first, curPair.second);
 }
 
 void ActorGraph::pushConnection(int srcGlobID, int destGlobID)
@@ -281,7 +283,14 @@ void ActorGraph::makeConnections()
 		switch(connectionTypeList[i])
 		{
 			case ActorConnectionType::LOCAL_LOCAL:
-				break;
+				{
+					//get actors
+					Actor* ac1 = getLocalActor(connectionList[i].first);
+					Actor* ac2 = getLocalActor(connectionList[i].second);
+					//make ports
+					//establish channel
+					break;
+				}
 			case ActorConnectionType::LOCAL_REMOTE:
 				break;
 			case ActorConnectionType::REMOTE_LOCAL:

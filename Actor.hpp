@@ -1,9 +1,17 @@
+#ifndef ACTOR_HPP
+#define ACTOR_HPP
+
+
 #include <stdlib.h>
 #include <utility>
-
+#include <vector>
 #include <string>
 
 #pragma once
+
+#include "InPort.hpp"
+#include "OutPort.hpp"
+
 
 class Actor
 {
@@ -12,6 +20,13 @@ public:
 	int rank;
 	int srno;
 	int globID;
+
+	std::vector<InPort* > inPortList;
+	std::vector<OutPort* > outPortList;
+
+	void addInPort(InPort* inPort);
+	void addOutPort(OutPort* outPort);
+
 	Actor(std::string othname, int othrank, int othsrno)
 	{
 		name = othname;
@@ -23,4 +38,7 @@ public:
 
 	static int encodeGlobID(int procNo, int actNo);
 	static std::pair<int,int> decodeGlobID(int inpGlobId);
+
 };
+
+#endif

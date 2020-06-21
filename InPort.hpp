@@ -1,9 +1,14 @@
-#include "Actor.hpp"
+#ifndef INPORT_HPP
+#define INPORT_HPP
+
 #include "Channel.hpp"
+
+#pragma once
 class InPort
 {
 public:
-    Actor *parentActor;
     Channel *connChannel;
     double** data;
 };
+
+#endif

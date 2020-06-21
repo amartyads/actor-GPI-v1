@@ -1,9 +1,14 @@
-#include "Actor.hpp"
+#ifndef OUTPORT_HPP
+#define OUTPORT_HPP
+
 #include "Channel.hpp"
+
+#pragma once
 class OutPort
 {
 public:
-    Actor *parentActor;
     Channel *connChannel;
     double** data;
 };
+
+#endif
