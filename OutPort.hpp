@@ -9,6 +9,11 @@ class OutPort
 public:
     Channel *connChannel;
     double** data;
+
+    OutPort(Channel* channel)
+    {
+        connChannel = channel;
+    }
 };
 
 #endif

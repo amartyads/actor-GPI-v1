@@ -283,14 +283,14 @@ void ActorGraph::makeConnections()
 		switch(connectionTypeList[i])
 		{
 			case ActorConnectionType::LOCAL_LOCAL:
-				{
-					//get actors
-					Actor* ac1 = getLocalActor(connectionList[i].first);
-					Actor* ac2 = getLocalActor(connectionList[i].second);
-					//make ports
-					//establish channel
-					break;
-				}
+			{
+				//get actors
+				Actor* ac1 = getLocalActor(connectionList[i].first);
+				Actor* ac2 = getLocalActor(connectionList[i].second);
+				//establish channel
+				//make ports
+				break;
+			}
 			case ActorConnectionType::LOCAL_REMOTE:
 				break;
 			case ActorConnectionType::REMOTE_LOCAL:

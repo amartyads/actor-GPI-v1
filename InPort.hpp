@@ -9,6 +9,11 @@ class InPort
 public:
     Channel *connChannel;
     double** data;
+
+    InPort(Channel* channel)
+    {
+        connChannel = channel;
+    }
 };
 
 #endif
