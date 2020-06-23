@@ -5,17 +5,18 @@
 #include <vector>
 #include <string>
 #include <utility>
+#include <cstdint>
 
-int Actor::encodeGlobID(int procNo, int actNo) //static
+uint64_t Actor::encodeGlobID(uint64_t procNo, uint64_t actNo) //static
 {
-	return (procNo << 10) | actNo;
+	return (procNo << 20) | actNo;
 }
 
-std::pair<int,int> Actor::decodeGlobID(int inpGlobId) //static
+std::pair<uint64_t,uint64_t> Actor::decodeGlobID(uint64_t inpGlobId) //static
 {
-	int procNo = inpGlobId >> 10;
-	int actNo = inpGlobId & ((1 << 10) - 1);
-	return *(new std::pair<int, int>(actNo, procNo));
+	uint64_t procNo = inpGlobId >> 20;
+	uint64_t actNo = inpGlobId & ((1 << 20) - 1);
+	return (std::make_pair(actNo, procNo));
 }
 
 void Actor::addInPort(InPort* inPort)

@@ -4,6 +4,7 @@
 #include "Actor.hpp"
 #include "ActorGraph.hpp"
 #include <stdlib.h>
+#include <cstdint>
 
 #ifndef ASSERT
 #define ASSERT(ec) gpi_util::success_or_exit(__FILE__,__LINE__,ec)
@@ -35,10 +36,10 @@ int main(int argc, char *argv[])
 	ag.printActors();
 	if (rank == 0)
 	{
-		int g1 = Actor::encodeGlobID(0,0);
-		int g2 = Actor::encodeGlobID(0,1);
-		int g3 = Actor::encodeGlobID(1,0);
-		int g4 = Actor::encodeGlobID(1,1);
+		uint64_t g1 = Actor::encodeGlobID(0,0);
+		uint64_t g2 = Actor::encodeGlobID(0,1);
+		uint64_t g3 = Actor::encodeGlobID(1,0);
+		uint64_t g4 = Actor::encodeGlobID(1,1);
 
 
 		int n1 = static_cast<int>(ag.getActorConnectionType(g1,g2));
@@ -46,10 +47,10 @@ int main(int argc, char *argv[])
 		int n3 = static_cast<int>(ag.getActorConnectionType(g3,g1));
 		int n4 = static_cast<int>(ag.getActorConnectionType(g3,g4));
 
-		gaspi_printf("Connection type %d - %d : %d \n", g1,g2,n1);
-		gaspi_printf("Connection type %d - %d : %d \n", g1,g3,n2);
-		gaspi_printf("Connection type %d - %d : %d \n", g3,g1,n3);
-		gaspi_printf("Connection type %d - %d : %d \n", g3,g4,n4);
+		gaspi_printf("Connection type %ld - %ld : %d \n", g1,g2,n1);
+		gaspi_printf("Connection type %ld - %ld : %d \n", g1,g3,n2);
+		gaspi_printf("Connection type %ld - %ld : %d \n", g3,g1,n3);
+		gaspi_printf("Connection type %ld - %ld : %d \n", g3,g4,n4);
 	}
 	
 

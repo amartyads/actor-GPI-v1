@@ -7,28 +7,29 @@
 
 #include <string>
 #include <vector>
+#include <cstdint>
 
 class ActorGraph
 {
 public:
 	std::vector<Actor* > localActorRefList;
-	std::vector<int> localActorIDList;
-	std::vector<int> remoteActorIDList;
+	std::vector<uint64_t> localActorIDList;
+	std::vector<uint64_t> remoteActorIDList;
 
-	std::vector<std::pair<int, int> > connectionList;
+	std::vector<std::pair<uint64_t, uint64_t> > connectionList;
 	
-	Actor* getLocalActor(int globID);
+	Actor* getLocalActor(uint64_t globID);
 	Actor* getLocalActor(std::string actName);
 
-	bool isLocalActor(int globID);
+	bool isLocalActor(uint64_t globID);
 	bool isLocalActor(std::string actName);
-	bool isRemoteActor(int globID);
-	bool isRegisteredActor(int globID);
+	bool isRemoteActor(uint64_t globID);
+	bool isRegisteredActor(uint64_t globID);
 
 
-	ActorConnectionType getActorConnectionType(int globIDSrcActor, int globIDDestActor);
-	ActorConnectionType getActorConnectionType(std::pair<int, int> curPair);
-	void pushConnection(int srcGlobID, int destGlobID);
+	ActorConnectionType getActorConnectionType(uint64_t globIDSrcActor, uint64_t globIDDestActor);
+	ActorConnectionType getActorConnectionType(std::pair<uint64_t, uint64_t> curPair);
+	void pushConnection(uint64_t srcGlobID, uint64_t destGlobID);
 	void makeConnections();
 
 	gaspi_rank_t rank, num;

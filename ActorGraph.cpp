@@ -10,6 +10,7 @@
 #include "LocalChannel.hpp"
 #include <stdlib.h>
 #include <algorithm>
+#include <cstdlib>
 
 #ifndef ASSERT
 #define ASSERT(ec) gpi_util::success_or_exit(__FILE__,__LINE__,ec)
@@ -32,7 +33,7 @@ void ActorGraph::addActor(Actor* newActor)
 
 void ActorGraph::syncActors()
 {
-	int actorElemSize = sizeof(int);
+	int actorElemSize = sizeof(uint64_t);
 	//int remoteNoActors[num];
 
 	const gaspi_queue_id_t queue_id_size = 0;
@@ -81,7 +82,7 @@ void ActorGraph::syncActors()
 
 	gaspi_pointer_t gasptr_local_array;
 	ASSERT (gaspi_segment_ptr (segment_id_loc_array, &gasptr_local_array));
-	int *local_array = (int*)(gasptr_local_array);
+	uint64_t *local_array = (uint64_t*)(gasptr_local_array);
 
 	for(int i = 0; i < *locSize; i++)
 		local_array[i] = localActorIDList[i];
@@ -110,25 +111,6 @@ void ActorGraph::syncActors()
 
 	ASSERT (gaspi_wait (queue_id_size, GASPI_BLOCK));
 
-	//ASSERT (gaspi_barrier (GASPI_GROUP_ALL, GASPI_BLOCK));
-
-	/*int maxSize = *locSize;
-	for(int i = 0; i < num; i++)
-	{
-		if(i == rank)
-			continue;
-		maxSize = maxSize > remoteNoActors[i]? maxSize: remoteNoActors[i];
-	}
-	//create pointer for receiving actors
-	gaspi_size_t segment_size_rem_arr = actorElemSize * maxSize;
-	//create segment for receiving actors
-	const gaspi_segment_id_t segment_id_rem_array = 3;
-	ASSERT (gaspi_segment_create(segment_id_rem_array, segment_size_rem_arr
-                           , GASPI_GROUP_ALL, GASPI_BLOCK
-                           , GASPI_ALLOC_DEFAULT
-                           )
-     );*/
-
 	int segSize = 0;
 	for(int i = 0; i < num; i++)
 	{
@@ -148,7 +130,7 @@ void ActorGraph::syncActors()
 
 	gaspi_pointer_t gasptr_remote_array;
 	ASSERT (gaspi_segment_ptr (segment_id_rem_array, &gasptr_remote_array));
-	int* remote_array = (int*)(gasptr_remote_array);
+	uint64_t* remote_array = (uint64_t*)(gasptr_remote_array);
 
 	int localOffset = 0;
 	//read in segment
@@ -185,17 +167,17 @@ void ActorGraph::printActors()
 {
 	for(int i = 0; i <localActorRefList.size(); i++)
 	{
-		gaspi_printf("Local actor name %s of %d, ID %d\n", (*localActorRefList[i]).name.c_str(), localActorRefList[i]->rank, localActorRefList[i]->globID);
+		gaspi_printf("Local actor name %s of %ld, ID %ld\n", (*localActorRefList[i]).name.c_str(), localActorRefList[i]->rank, localActorRefList[i]->globID);
 	}
 	gaspi_printf("No of actors received: %d\n", remoteActorIDList.size());
 	for(int i = 0; i <remoteActorIDList.size(); i++)
 	{
 		std::pair<int, int> temp = Actor::decodeGlobID(remoteActorIDList[i]);
 
-		gaspi_printf("Non local actor ID %d no %d of rank %d \n", remoteActorIDList[i],temp.first, temp.second);
+		gaspi_printf("Non local actor ID %ld no %ld of rank %ld \n", remoteActorIDList[i],temp.first, temp.second);
 	}
 }
-Actor* ActorGraph::getLocalActor(int globID)
+Actor* ActorGraph::getLocalActor(uint64_t globID)
 {
 	for(int i = 0; i < localActorRefList.size(); i++)
 	{
@@ -213,7 +195,7 @@ Actor* ActorGraph::getLocalActor(std::string actName)
 	}
 	return (new Actor("Not found",0,0));
 }
-bool ActorGraph::isLocalActor(int globID)
+bool ActorGraph::isLocalActor(uint64_t globID)
 {
 	if(getLocalActor(globID)->name == "Not found")
 		return false;
@@ -225,7 +207,7 @@ bool ActorGraph::isLocalActor(std::string actName)
 		return false;
 	return true;
 }
-bool ActorGraph::isRemoteActor(int globID)
+bool ActorGraph::isRemoteActor(uint64_t globID)
 {
 	for(int i = 0; i < remoteActorIDList.size(); i++)
 	{
@@ -234,12 +216,12 @@ bool ActorGraph::isRemoteActor(int globID)
 	}
 	return false;
 }
-bool ActorGraph::isRegisteredActor(int globID)
+bool ActorGraph::isRegisteredActor(uint64_t globID)
 {
 	return (isLocalActor(globID) || isRemoteActor(globID));
 }
 
-ActorConnectionType ActorGraph::getActorConnectionType(int globIDSrcActor, int globIDDestActor)
+ActorConnectionType ActorGraph::getActorConnectionType(uint64_t globIDSrcActor, uint64_t globIDDestActor)
 {
 	if(!isRegisteredActor(globIDSrcActor) || !isRegisteredActor(globIDDestActor))
 		return ActorConnectionType::ACTOR_DNE;
@@ -256,12 +238,12 @@ ActorConnectionType ActorGraph::getActorConnectionType(int globIDSrcActor, int g
 		return ActorConnectionType::REMOTE_REMOTE;
 }
 
-ActorConnectionType ActorGraph::getActorConnectionType(std::pair<int, int> curPair)
+ActorConnectionType ActorGraph::getActorConnectionType(std::pair<uint64_t, uint64_t> curPair)
 {
 	return getActorConnectionType(curPair.first, curPair.second);
 }
 
-void ActorGraph::pushConnection(int srcGlobID, int destGlobID)
+void ActorGraph::pushConnection(uint64_t srcGlobID, uint64_t destGlobID)
 {
 	connectionList.push_back(std::make_pair(srcGlobID, destGlobID));
 }

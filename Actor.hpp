@@ -6,6 +6,7 @@
 #include <utility>
 #include <vector>
 #include <string>
+#include <cstdint>
 
 #pragma once
 
@@ -17,9 +18,9 @@ class Actor
 {
 public:
 	std::string name;
-	int rank;
-	int srno;
-	int globID;
+	uint64_t rank;
+	uint64_t srno;
+	uint64_t globID;
 	int noTimesRan;
 
 	std::vector<InPort* > inPortList;
@@ -28,18 +29,18 @@ public:
 	void addInPort(InPort* inPort);
 	void addOutPort(OutPort* outPort);
 
-	Actor(std::string othname, int othrank, int othsrno)
+	Actor(std::string othname, uint64_t othrank, uint64_t othsrno)
 	{
 		name = othname;
 		rank = othrank;
 		srno = othsrno;
-		globID = (rank << 10) | srno;
+		globID = Actor::encodeGlobID(othrank, othsrno);
 		noTimesRan = 0;
 	}
-	Actor(int rank, int srno) : Actor("A-"+std::to_string(rank)+"-"+std::to_string(srno), rank, srno) { }
+	Actor(uint64_t rank, uint64_t srno) : Actor("A-"+std::to_string(rank)+"-"+std::to_string(srno), rank, srno) { }
 
-	static int encodeGlobID(int procNo, int actNo);
-	static std::pair<int,int> decodeGlobID(int inpGlobId);
+	static uint64_t encodeGlobID(uint64_t procNo, uint64_t actNo);
+	static std::pair<uint64_t,uint64_t> decodeGlobID(uint64_t inpGlobId);
 
 };
 
