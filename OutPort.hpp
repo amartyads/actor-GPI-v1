@@ -8,12 +8,14 @@ class OutPort
 {
 public:
     Channel *connChannel;
-    double** data;
+    std::queue<double**> data;
 
     OutPort(Channel* channel)
     {
         connChannel = channel;
     }
+
+    void write(double** ndata);
 };
 
 #endif
