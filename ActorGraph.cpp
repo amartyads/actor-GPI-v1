@@ -160,6 +160,11 @@ void ActorGraph::syncActors()
 		remoteActorIDList.push_back(remote_array[j]);
 	}
 
+	ASSERT (gaspi_segment_delete(segment_id_loc_size) );
+	ASSERT (gaspi_segment_delete(segment_id_rem_size) );
+	ASSERT (gaspi_segment_delete(segment_id_loc_array ) );
+	ASSERT (gaspi_segment_delete(segment_id_rem_array ) );
+
 	ASSERT (gaspi_barrier (GASPI_GROUP_ALL, GASPI_BLOCK));
 }
 
@@ -272,7 +277,7 @@ void ActorGraph::makeConnections()
 				Actor* ac1 = getLocalActor(connectionList[i].first);
 				Actor* ac2 = getLocalActor(connectionList[i].second);
 				//establish channel
-				Channel* channel = new LocalChannel(ActorConnectionType::LOCAL_LOCAL);
+				Channel* channel = new LocalChannel();
 				//make ports
 				InPort* inPort = new InPort(channel);
 				OutPort* outPort = new OutPort(channel);
@@ -283,9 +288,31 @@ void ActorGraph::makeConnections()
 				break;
 			}
 			case ActorConnectionType::LOCAL_REMOTE:
+			{
+				//get actors
+				Actor* ac1 = getLocalActor(connectionList[i].first);
+				//establish channel
+				Channel* channel = new LocalChannel();
+				//make ports
+				OutPort* outPort = new OutPort(channel);
+
+				ac1->addOutPort(outPort);
+
 				break;
+			}
 			case ActorConnectionType::REMOTE_LOCAL:
+			{
+				//get actors
+				Actor* ac2 = getLocalActor(connectionList[i].second);
+				//establish channel
+				Channel* channel = new LocalChannel();
+				//make ports
+				InPort* inPort = new InPort(channel);
+
+				ac2->addInPort(inPort);
+
 				break;
+			}
 			case ActorConnectionType::REMOTE_REMOTE:
 				//do nothing
 				break;

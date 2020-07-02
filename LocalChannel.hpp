@@ -11,9 +11,9 @@ public:
 
     void pushData();
     void pullData();
-    LocalChannel(ActorConnectionType conn)
+    LocalChannel()
     {
-        currConnectionType = conn;
+        currConnectionType = ActorConnectionType::LOCAL_LOCAL;
     }
 };
 
