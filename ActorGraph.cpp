@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <algorithm>
 #include <cstdlib>
+#include <chrono>
 
 #ifndef ASSERT
 #define ASSERT(ec) gpi_util::success_or_exit(__FILE__,__LINE__,ec)
@@ -318,4 +319,17 @@ void ActorGraph::makeConnections()
 				break;
 		}
 	}
+}
+double ActorGraph::run()
+{
+	auto start = std::chrono::steady_clock::now();
+
+	for (int i = 0; i < localActorRefList.size(); i++)
+	{
+		localActorRefList[i]->act();
+	}
+
+	auto end = std::chrono::steady_clock::now();
+	runTime = std::chrono::duration<double, std::ratio<1>>(end - start).count();
+	return runTime;
 }

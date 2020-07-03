@@ -32,6 +32,8 @@ public:
 	void pushConnection(uint64_t srcGlobID, uint64_t destGlobID);
 	void makeConnections();
 
+	double run();
+
 	gaspi_rank_t rank, num;
 	ActorGraph();
 	void addActor(Actor* newActor);
