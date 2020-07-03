@@ -3,3 +3,6 @@ ActorGraph
 -store references to actors
 -make connections
 -iterate through actors
+
+To add
+-labels to ports
