@@ -8,14 +8,15 @@ class OutPort
 {
 public:
     Channel *connChannel;
-    std::queue<double**> data;
+    double* data;
 
     OutPort(Channel* channel)
     {
         connChannel = channel;
     }
 
-    void write(double** ndata);
+    bool isAvailable();         //poll channel to see if space available
+    void write(double* ndata);  //write to channel
 };
 
 #endif

@@ -9,15 +9,15 @@ class InPort
 {
 public:
     Channel *connChannel;
-    std::queue<double**> data;
+    double* data;
 
     InPort(Channel* channel)
     {
         connChannel = channel;
     }
 
-    double** read();
-    bool isAvailable();
+    double* read();     // read from channel, return
+    bool isAvailable(); // poll channel to see if data available
 };
 
 #endif

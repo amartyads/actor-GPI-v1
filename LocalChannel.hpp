@@ -8,13 +8,11 @@
 class LocalChannel: public Channel
 {
 public:
-
-    void pushData();
-    void pullData();
-    LocalChannel()
-    {
-        currConnectionType = ActorConnectionType::LOCAL_LOCAL;
-    }
+    void pushData(double* ndata);
+    double* pullData();
+    bool isAvailableToPush();
+    bool isAvailableToPull();
+    LocalChannel();
 };
 
 #endif
