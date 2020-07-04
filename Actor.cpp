@@ -20,7 +20,56 @@ void Actor::addOutPort(OutPort* outPort)
 
 void Actor::act()
 {
-	std::cout << "Hello from" << globID << std::endl;
+	if(globID == 0) //starter
+	{
+		if(noTimesRan == 0)
+		{
+			std::cout << "Actor 0 commencing pingpong" <<std::endl;
+			receivedData = true;
+			std::vector<double> data {42.42};
+			for(int j = 0; j < outPortList.size(); j++)
+			{
+				if(outPortList[j]->isAvailable())
+					outPortList[j]->write(data);
+			}
+			noTimesRan++;
+		}
+		else
+		{
+			std::cout << "Actor 0 already commenced pingpong" <<std::endl;
+		}
+		
+	}
+	else
+	{
+		bool hasInData = false;
+		int i;
+		for(i = 0; i < inPortList.size(); i++)
+		{
+			if(inPortList[i]->isAvailable())
+			{
+				hasInData = true;
+				break;
+			}
+		}
+		if(hasInData)
+		{
+			std::vector<double> data = inPortList[i]->read();
+			std::cout << "Actor " << globID << " received "<< data[0] << std::endl;
+			for(int j = 0; j < outPortList.size(); j++)
+			{
+				if(outPortList[j]->isAvailable())
+					outPortList[j]->write(data);
+			}
+			receivedData = true;
+		}
+		else
+		{
+			std::cout << "Actor " << globID << " received nothing yet." << std::endl;
+		}
+		
+	}
+	
 }
 
 

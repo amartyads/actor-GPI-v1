@@ -39,8 +39,10 @@ public:
 	}
 	Actor(uint64_t rank, uint64_t srno) : Actor("A-"+std::to_string(rank)+"-"+std::to_string(srno), rank, srno) { }
 
+	//temps
 	void act();
-
+	bool receivedData = false;
+	//statics
 	static uint64_t encodeGlobID(uint64_t procNo, uint64_t actNo);
 	static std::pair<uint64_t,uint64_t> decodeGlobID(uint64_t inpGlobId);
 

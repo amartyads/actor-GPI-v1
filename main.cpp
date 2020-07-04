@@ -23,11 +23,12 @@ int main(int argc, char *argv[])
 	ASSERT( gaspi_proc_num(&num) );
 
 	Actor *localActor1 = new Actor(rank,0);
-	ag.addActor(localActor1);
 	Actor *localActor2 = new Actor(rank,1);
+	Actor *localActor3 = new Actor(rank,2);
+
+	ag.addActor(localActor3);
 	ag.addActor(localActor2);
-	//Actor *localActor3 = new Actor(2,rank);
-	//ag.addActor(localActor3);
+	ag.addActor(localActor1);
 
 
 	ASSERT (gaspi_barrier (GASPI_GROUP_ALL, GASPI_BLOCK));
@@ -35,8 +36,16 @@ int main(int argc, char *argv[])
 	ag.syncActors();
 	ag.printActors();
 	
-	double rt = ag.run();
-	gaspi_printf("Runtime from rank %d: %lf\n",rank,rt);
+	ag.pushConnection(0,1);
+	ag.pushConnection(1,2);
+
+	ag.makeConnections();
+
+	while(! (localActor3->receivedData))
+	{
+		double rt = ag.run();
+		gaspi_printf("Runtime from rank %d: %lf\n",rank,rt);
+	}
 
 	ASSERT( gaspi_proc_term(GASPI_BLOCK) );
 
