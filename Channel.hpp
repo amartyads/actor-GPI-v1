@@ -11,7 +11,7 @@ class Channel
 public:
     ActorConnectionType currConnectionType;
     int maxCapacity, curCapacity;
-    std::queue<vector<double> > data;
+    std::queue< std::vector<double> > data;
 
     virtual void pushData(std::vector<double> &ndata) = 0;
     virtual std::vector<double> pullData() = 0;

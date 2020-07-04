@@ -35,7 +35,8 @@ int main(int argc, char *argv[])
 	ag.syncActors();
 	ag.printActors();
 	
-	
+	double rt = ag.run();
+	gaspi_printf("Runtime from rank %d: %lf\n",rank,rt);
 
 	ASSERT( gaspi_proc_term(GASPI_BLOCK) );
 

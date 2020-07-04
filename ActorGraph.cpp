@@ -173,14 +173,14 @@ void ActorGraph::printActors()
 {
 	for(int i = 0; i <localActorRefList.size(); i++)
 	{
-		gaspi_printf("Local actor name %s of %ld, ID %ld\n", (*localActorRefList[i]).name.c_str(), localActorRefList[i]->rank, localActorRefList[i]->globID);
+		gaspi_printf("Local actor name %s of %" PRIu64 ", ID %" PRIu64 "\n", (*localActorRefList[i]).name.c_str(), localActorRefList[i]->rank, localActorRefList[i]->globID);
 	}
 	gaspi_printf("No of actors received: %d\n", remoteActorIDList.size());
 	for(int i = 0; i <remoteActorIDList.size(); i++)
 	{
 		std::pair<int, int> temp = Actor::decodeGlobID(remoteActorIDList[i]);
 
-		gaspi_printf("Non local actor ID %ld no %ld of rank %ld \n", remoteActorIDList[i],temp.first, temp.second);
+		gaspi_printf("Non local actor ID %" PRIu64 " no %" PRIu64 " of rank %" PRIu64 " \n", remoteActorIDList[i],temp.first, temp.second);
 	}
 }
 Actor* ActorGraph::getLocalActor(uint64_t globID)
@@ -330,6 +330,6 @@ double ActorGraph::run()
 	}
 
 	auto end = std::chrono::steady_clock::now();
-	runTime = std::chrono::duration<double, std::ratio<1>>(end - start).count();
+	double runTime = std::chrono::duration<double, std::ratio<1>>(end - start).count();
 	return runTime;
 }

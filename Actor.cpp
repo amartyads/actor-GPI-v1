@@ -20,7 +20,7 @@ void Actor::addOutPort(OutPort* outPort)
 
 void Actor::act()
 {
-	std::cout << "Hello from" << globID << endl;
+	std::cout << "Hello from" << globID << std::endl;
 }
 
 

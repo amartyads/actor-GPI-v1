@@ -19,18 +19,18 @@ std::vector<double> LocalChannel::pullData()
         std::vector<double> toRet = data.front();
         data.pop();
         curCapacity++;
+        return toRet;
     }
     else
     {
         throw std::runtime_error("No data in channel");
     }
-    return toRet;
 }
 void LocalChannel::pushData(std::vector<double> &ndata)
 {
     if(this->isAvailableToPush())
     {
-        vector<double> localCpy(ndata);
+        std::vector<double> localCpy(ndata);
         data.push(localCpy);
         curCapacity--;
     }
