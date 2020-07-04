@@ -3,20 +3,21 @@
 
 #include "Channel.hpp"
 #include <queue>
+#include <vector>
 
 #pragma once
 class InPort
 {
 public:
     Channel *connChannel;
-    double* data;
+    std::vector<double> data;
 
     InPort(Channel* channel)
     {
         connChannel = channel;
     }
 
-    double* read();     // read from channel, return
+    std::vector<double> read();     // read from channel, return
     bool isAvailable(); // poll channel to see if data available
 };
 

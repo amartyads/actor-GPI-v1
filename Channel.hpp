@@ -5,15 +5,16 @@
 
 #include "connection-type-util.hpp"
 #include <queue>
+#include <vector>
 class Channel
 {
 public:
     ActorConnectionType currConnectionType;
     int maxCapacity, curCapacity;
-    std::queue<double* > data;
+    std::queue<vector<double> > data;
 
-    virtual void pushData(double* ndata) = 0;
-    virtual double* pullData() = 0;
+    virtual void pushData(std::vector<double> &ndata) = 0;
+    virtual std::vector<double> pullData() = 0;
     virtual bool isAvailableToPush() = 0;
     virtual bool isAvailableToPull() = 0;
 };

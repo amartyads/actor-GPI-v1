@@ -5,11 +5,13 @@
 
 #include "connection-type-util.hpp"
 #include "Channel.hpp"
+
+#include <vector>
 class LocalChannel: public Channel
 {
 public:
-    void pushData(double* ndata);
-    double* pullData();
+    void pushData(std::vector<double> &ndata);
+    std::vector<double> pullData();
     bool isAvailableToPush();
     bool isAvailableToPull();
     LocalChannel();

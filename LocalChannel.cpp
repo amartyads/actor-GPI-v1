@@ -3,6 +3,8 @@
 #include "LocalChannel.hpp"
 
 #include <stdexcept>
+#include <queue>
+#include <vector>
 
 LocalChannel::LocalChannel()
 {
@@ -10,11 +12,11 @@ LocalChannel::LocalChannel()
     maxCapacity = 3;
     curCapacity = maxCapacity;
 }
-double* LocalChannel::pullData()
+std::vector<double> LocalChannel::pullData()
 {
     if(this->isAvailableToPull())
     {
-        double* toRet = data.front();
+        std::vector<double> toRet = data.front();
         data.pop();
         curCapacity++;
     }
@@ -22,13 +24,14 @@ double* LocalChannel::pullData()
     {
         throw std::runtime_error("No data in channel");
     }
-    
+    return toRet;
 }
-void LocalChannel::pushData(double* ndata)
+void LocalChannel::pushData(std::vector<double> &ndata)
 {
     if(this->isAvailableToPush())
     {
-        data.push(ndata);
+        vector<double> localCpy(ndata);
+        data.push(localCpy);
         curCapacity--;
     }
     else

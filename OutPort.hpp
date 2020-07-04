@@ -3,12 +3,14 @@
 
 #include "Channel.hpp"
 
+#include <vector>
+
 #pragma once
 class OutPort
 {
 public:
     Channel *connChannel;
-    double* data;
+    std::vector<double> data;
 
     OutPort(Channel* channel)
     {
@@ -16,7 +18,7 @@ public:
     }
 
     bool isAvailable();         //poll channel to see if space available
-    void write(double* ndata);  //write to channel
+    void write(std::vector<double> &ndata);  //write to channel
 };
 
 #endif

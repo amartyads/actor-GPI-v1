@@ -1,7 +1,7 @@
 #include "OutPort.hpp"
 #include "Channel.hpp"
 
-void OutPort::write(double* ndata)
+void OutPort::write(std::vector<double> &ndata)
 {
     connChannel->pushData(ndata);
 }

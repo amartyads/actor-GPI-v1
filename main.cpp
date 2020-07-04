@@ -34,24 +34,7 @@ int main(int argc, char *argv[])
 
 	ag.syncActors();
 	ag.printActors();
-	if (rank == 0)
-	{
-		uint64_t g1 = Actor::encodeGlobID(0,0);
-		uint64_t g2 = Actor::encodeGlobID(0,1);
-		uint64_t g3 = Actor::encodeGlobID(1,0);
-		uint64_t g4 = Actor::encodeGlobID(1,1);
-
-
-		int n1 = static_cast<int>(ag.getActorConnectionType(g1,g2));
-		int n2 = static_cast<int>(ag.getActorConnectionType(g1,g3));
-		int n3 = static_cast<int>(ag.getActorConnectionType(g3,g1));
-		int n4 = static_cast<int>(ag.getActorConnectionType(g3,g4));
-
-		gaspi_printf("Connection type %ld - %ld : %d \n", g1,g2,n1);
-		gaspi_printf("Connection type %ld - %ld : %d \n", g1,g3,n2);
-		gaspi_printf("Connection type %ld - %ld : %d \n", g3,g1,n3);
-		gaspi_printf("Connection type %ld - %ld : %d \n", g3,g4,n4);
-	}
+	
 	
 
 	ASSERT( gaspi_proc_term(GASPI_BLOCK) );
