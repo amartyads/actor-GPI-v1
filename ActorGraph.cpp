@@ -9,6 +9,7 @@
 #include "Channel.hpp"
 #include "LocalChannel.hpp"
 #include <stdlib.h>
+#include <inttypes.h>
 #include <algorithm>
 #include <cstdlib>
 #include <chrono>
