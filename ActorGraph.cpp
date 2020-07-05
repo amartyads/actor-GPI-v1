@@ -8,6 +8,7 @@
 #include "OutPort.hpp"
 #include "Channel.hpp"
 #include "LocalChannel.hpp"
+#include "RemoteChannel.hpp"
 #include <stdlib.h>
 #include <inttypes.h>
 #include <algorithm>
@@ -294,7 +295,7 @@ void ActorGraph::makeConnections()
 				//get actors
 				Actor* ac1 = getLocalActor(connectionList[i].first);
 				//establish channel
-				Channel* channel = new LocalChannel();
+				Channel* channel = new RemoteChannel(connectionTypeList[i], i);
 				//make ports
 				OutPort* outPort = new OutPort(channel);
 
@@ -307,7 +308,7 @@ void ActorGraph::makeConnections()
 				//get actors
 				Actor* ac2 = getLocalActor(connectionList[i].second);
 				//establish channel
-				Channel* channel = new LocalChannel();
+				Channel* channel = new RemoteChannel(connectionTypeList[i], i);
 				//make ports
 				InPort* inPort = new InPort(channel);
 
