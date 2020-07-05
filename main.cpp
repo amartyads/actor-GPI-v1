@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
 
 	ag.makeConnections();
 
-	while(! (localActor3->receivedData))
+	while(! (localActor1->receivedData && localActor2->receivedData && localActor3->receivedData))
 	{
 		double rt = ag.run();
 		gaspi_printf("Runtime from rank %d: %lf\n",rank,rt);

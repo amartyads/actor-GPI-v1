@@ -270,6 +270,10 @@ void ActorGraph::makeConnections()
 	//communicate requirements
 	//distribute among queue_max no of queues
 
+	gaspi_number_t maxSeg;
+	ASSERT( gaspi_segment_max(&maxSeg));
+	int maximumSeg = (int) maxSeg;
+
 	for(int i = 0; i < connectionList.size(); i++)
 	{
 		switch(connectionTypeList[i])
@@ -295,7 +299,9 @@ void ActorGraph::makeConnections()
 				//get actors
 				Actor* ac1 = getLocalActor(connectionList[i].first);
 				//establish channel
-				Channel* channel = new RemoteChannel(connectionTypeList[i], i);
+				Channel* channel = new RemoteChannel(connectionTypeList[i], i % maximumSeg, 
+													connectionList[i].first, connectionList[i].second,
+													Actor::decodeGlobID(connectionList[i].second).second);
 				//make ports
 				OutPort* outPort = new OutPort(channel);
 
@@ -308,7 +314,9 @@ void ActorGraph::makeConnections()
 				//get actors
 				Actor* ac2 = getLocalActor(connectionList[i].second);
 				//establish channel
-				Channel* channel = new RemoteChannel(connectionTypeList[i], i);
+				Channel* channel = new RemoteChannel(connectionTypeList[i], i % maximumSeg, 
+													connectionList[i].first, connectionList[i].second,
+													Actor::decodeGlobID(connectionList[i].first).second);
 				//make ports
 				InPort* inPort = new InPort(channel);
 

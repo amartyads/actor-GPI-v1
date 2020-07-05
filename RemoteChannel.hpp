@@ -7,6 +7,7 @@
 #include "Channel.hpp"
 
 #include <vector>
+#include <cstdint>
 class RemoteChannel: public Channel
 {
 public:
@@ -17,10 +18,13 @@ public:
 
     int segmentID;
     int segmentSize;
+    double srcID, dstID;
+    double* localSegmentPointer;
+    uint64_t remoteRank;
     
     void initChannel();
 
-    RemoteChannel(ActorConnectionType actorConnType, int segID);
+    RemoteChannel(ActorConnectionType actorConnType, int segID, uint64_t source, uint64_t dest, uint64_t remRank);
 };
 
 #endif
