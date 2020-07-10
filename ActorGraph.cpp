@@ -258,6 +258,8 @@ void ActorGraph::pushConnection(uint64_t srcGlobID, uint64_t destGlobID)
 
 void ActorGraph::makeConnections()
 {
+	
+	ASSERT (gaspi_barrier (GASPI_GROUP_ALL, GASPI_BLOCK));
 	std::sort(connectionList.begin(), connectionList.end());
 
 	std::vector<ActorConnectionType> connectionTypeList;
@@ -329,9 +331,12 @@ void ActorGraph::makeConnections()
 				break;
 		}
 	}
+	
+	ASSERT (gaspi_barrier (GASPI_GROUP_ALL, GASPI_BLOCK));
 }
 double ActorGraph::run()
-{
+{	
+	//ASSERT (gaspi_barrier (GASPI_GROUP_ALL, GASPI_BLOCK));
 	auto start = std::chrono::steady_clock::now();
 
 	for (int i = 0; i < localActorRefList.size(); i++)

@@ -29,7 +29,8 @@ RemoteChannel::RemoteChannel(ActorConnectionType actorConnType, int segID, uint6
 }
 void RemoteChannel::initChannel()
 {
-    segmentSize = 1010 * sizeof(double);
+    //insert check to see if segment exists already 
+    segmentSize = 110 * sizeof(double);
 
     const gaspi_segment_id_t tempID = segmentID;
     const gaspi_size_t tempSize = segmentSize;
@@ -43,10 +44,13 @@ void RemoteChannel::initChannel()
 	localSegmentPointer = (double*)(gasptr_locSeg);
 }
 std::vector<double> RemoteChannel::pullData()
-{
-    if(this->isAvailableToPull() && localSegmentPointer[0] == srcID && localSegmentPointer[1] == dstID)
+{   
+    //gaspi_printf("In pull\n");
+    ASSERT (gaspi_wait (1, GASPI_BLOCK));
+    if(localSegmentPointer[0] == srcID && localSegmentPointer[1] == dstID)
     {
-        std::vector<double> toRet(localSegmentPointer + 3, localSegmentPointer + (int)localSegmentPointer[2]);
+        //gaspi_printf("Size: %d\n",(int)localSegmentPointer[2]);
+        std::vector<double> toRet(localSegmentPointer + 3, localSegmentPointer + 3 + (int)localSegmentPointer[2]);
         //curCapacity++;
         return toRet;
     }
@@ -57,6 +61,7 @@ std::vector<double> RemoteChannel::pullData()
 }
 void RemoteChannel::pushData(std::vector<double> &ndata)
 {
+    
     if(this->isAvailableToPush())
     {
         std::vector<double> localCpy {srcID, dstID, (double)ndata.size()};
@@ -67,13 +72,16 @@ void RemoteChannel::pushData(std::vector<double> &ndata)
         }
         ASSERT (gaspi_write_notify ( segmentID, 0
 	                     , remoteRank, segmentID, 0
-	                     , segmentSize, 
+	                     , localCpy.size() * sizeof(double), 
                          1, 1,
                          1, GASPI_BLOCK
 	                     )
 	         );
         //data.push(localCpy);
         //curCapacity--;
+        
+	    ASSERT (gaspi_wait (1, GASPI_BLOCK));
+        //gaspi_printf("Data pushed\n");
     }
     else
     {
@@ -82,6 +90,7 @@ void RemoteChannel::pushData(std::vector<double> &ndata)
 }
 bool RemoteChannel::isAvailableToPull()
 {
+    
     return gpi_util::test_notif_or_exit(segmentID, 1, 1);
     //return dataStale;
     //return (curCapacity < maxCapacity);

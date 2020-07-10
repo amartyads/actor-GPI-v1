@@ -20,6 +20,7 @@ void Actor::addOutPort(OutPort* outPort)
 
 void Actor::act()
 {
+	//std::cout << "Actor " << globID << std::endl;
 	if(globID == 0) //starter
 	{
 		if(noTimesRan == 0)
@@ -56,6 +57,7 @@ void Actor::act()
 		{
 			std::vector<double> data = inPortList[i]->read();
 			std::cout << "Actor " << globID << " received "<< data[0] << std::endl;
+			data[0] = data[0] + 10.0;
 			for(int j = 0; j < outPortList.size(); j++)
 			{
 				if(outPortList[j]->isAvailable())
