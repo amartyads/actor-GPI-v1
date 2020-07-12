@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <chrono>
+#include <sstream>
 
 #ifndef ASSERT
 #define ASSERT(ec) gpi_util::success_or_exit(__FILE__,__LINE__,ec)
@@ -24,8 +25,18 @@
 
 ActorGraph::ActorGraph()
 {
-	ASSERT( gaspi_proc_rank(&rank));
+	ASSERT( gaspi_proc_rank(&rank) );
 	ASSERT( gaspi_proc_num(&num) );
+	dataBlockSize = 100;
+	dataQueueLen = 3;
+}
+
+ActorGraph::ActorGraph(int dataBlockSize, int dataQueueLen)
+{
+	ASSERT( gaspi_proc_rank(&rank) );
+	ASSERT( gaspi_proc_num(&num) );
+	this->dataBlockSize = dataBlockSize;
+	this->dataQueueLen = dataQueueLen;
 }
 
 void ActorGraph::addActor(Actor* newActor)
@@ -182,7 +193,7 @@ void ActorGraph::printActors()
 	{
 		std::pair<int, int> temp = Actor::decodeGlobID(remoteActorIDList[i]);
 
-		gaspi_printf("Non local actor ID %" PRIu64 " no %" PRIu64 " of rank %" PRIu64 " \n", remoteActorIDList[i],temp.first, temp.second);
+		gaspi_printf("Non local actor ID %" PRIu64 " no %" PRIu64 " of rank %" PRIu64 " \n", remoteActorIDList[i],temp.second, temp.first);
 	}
 }
 Actor* ActorGraph::getLocalActor(uint64_t globID)
@@ -232,7 +243,7 @@ bool ActorGraph::isRegisteredActor(uint64_t globID)
 ActorConnectionType ActorGraph::getActorConnectionType(uint64_t globIDSrcActor, uint64_t globIDDestActor)
 {
 	if(!isRegisteredActor(globIDSrcActor) || !isRegisteredActor(globIDDestActor))
-		return ActorConnectionType::ACTOR_DNE;
+		return ActorConnectionType::ACTOR_DNE;										//to fix
 	
 	bool srcLoc = isLocalActor(globIDSrcActor);
 	bool destLoc = isLocalActor(globIDDestActor);
@@ -256,11 +267,17 @@ void ActorGraph::pushConnection(uint64_t srcGlobID, uint64_t destGlobID)
 	connectionList.push_back(std::make_pair(srcGlobID, destGlobID));
 }
 
+void ActorGraph::sortConnections()
+{
+	std::sort(connectionList.begin(), connectionList.end());
+}
+
 void ActorGraph::makeConnections()
 {
 	
 	ASSERT (gaspi_barrier (GASPI_GROUP_ALL, GASPI_BLOCK));
-	std::sort(connectionList.begin(), connectionList.end());
+	
+	sortConnections();
 
 	std::vector<ActorConnectionType> connectionTypeList;
 
@@ -268,13 +285,17 @@ void ActorGraph::makeConnections()
 	{
 		connectionTypeList.push_back(getActorConnectionType(connectionList[i]));
 	}
-	//count no of remote connections
-	//communicate requirements
-	//distribute among queue_max no of queues
 
-	gaspi_number_t maxSeg;
-	ASSERT( gaspi_segment_max(&maxSeg));
-	int maximumSeg = (int) maxSeg;
+	genOffsets();
+	
+	uint64_t localPushSegmentSize = dataBlocksInSegment[rank] * (3+dataBlockSize) * dataQueueLen * sizeof(double);
+	uint64_t localPullSegmentSize = (3+dataBlockSize) * sizeof(double);
+
+	double* pushSegmentPtr;
+	double* pullSegmentPtr;
+	pushSegmentPtr = (double*) (gpi_util::create_segment_return_ptr(1, localPushSegmentSize));
+	pullSegmentPtr = (double*) (gpi_util::create_segment_return_ptr(2, localPullSegmentSize));
+	
 
 	for(int i = 0; i < connectionList.size(); i++)
 	{
@@ -301,9 +322,10 @@ void ActorGraph::makeConnections()
 				//get actors
 				Actor* ac1 = getLocalActor(connectionList[i].first);
 				//establish channel
-				Channel* channel = new RemoteChannel(connectionTypeList[i], i % maximumSeg, 
+				Channel* channel = new RemoteChannel(connectionTypeList[i], 3+dataBlockSize, dataQueueLen,
+													true, false, (pushSegmentPtr + ((3+dataBlockSize) * dataQueueLen * sizeof(double) * offsetVals[i])), NULL, 
 													connectionList[i].first, connectionList[i].second,
-													Actor::decodeGlobID(connectionList[i].second).second);
+													Actor::decodeGlobID(connectionList[i].second).first, offsetVals[i]);
 				//make ports
 				OutPort* outPort = new OutPort(channel);
 
@@ -316,9 +338,10 @@ void ActorGraph::makeConnections()
 				//get actors
 				Actor* ac2 = getLocalActor(connectionList[i].second);
 				//establish channel
-				Channel* channel = new RemoteChannel(connectionTypeList[i], i % maximumSeg, 
+				Channel* channel = new RemoteChannel(connectionTypeList[i], 3+dataBlockSize, dataQueueLen,
+													false, true, NULL, pullSegmentPtr, 
 													connectionList[i].first, connectionList[i].second,
-													Actor::decodeGlobID(connectionList[i].first).second);
+													Actor::decodeGlobID(connectionList[i].second).first, offsetVals[i]);
 				//make ports
 				InPort* inPort = new InPort(channel);
 
@@ -334,6 +357,37 @@ void ActorGraph::makeConnections()
 	
 	ASSERT (gaspi_barrier (GASPI_GROUP_ALL, GASPI_BLOCK));
 }
+
+void ActorGraph::genOffsets()
+{
+	int64_t pushVal;
+	dataBlocksInSegment.assign(num, 0);
+	for(int i = 0; i < connectionList.size(); i++)
+	{
+		pushVal = -1;
+		uint64_t srcRank = Actor::decodeGlobID(connectionList[i].first).first;
+		uint64_t dstRank = Actor::decodeGlobID(connectionList[i].second).first;
+		if(srcRank == dstRank) //LOCAL_LOCAL
+			pushVal = -1;
+		else
+		{
+			pushVal = dataBlocksInSegment[srcRank];
+			dataBlocksInSegment[srcRank]++;
+		}
+		offsetVals.push_back(pushVal); //pushes -1 into uint64, but will never be accessed anyway
+	}
+}
+
+std::string ActorGraph::getOffsetString()
+{
+	std::stringstream ss;
+	for(auto it = offsetVals.begin(); it != offsetVals.end(); ++it)
+	{
+		ss << *it << " ";
+	}
+	return ss.str();
+}
+
 double ActorGraph::run()
 {	
 	//ASSERT (gaspi_barrier (GASPI_GROUP_ALL, GASPI_BLOCK));

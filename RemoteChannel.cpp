@@ -15,43 +15,59 @@
 #define ASSERT(ec) gpi_util::success_or_exit(__FILE__,__LINE__,ec)
 #endif
 
-RemoteChannel::RemoteChannel(ActorConnectionType actorConnType, int segID, uint64_t source, uint64_t dest, uint64_t remRank)
+RemoteChannel::RemoteChannel(ActorConnectionType actorConnType, int blockSize, int queueLen,
+                            bool isSender, bool isReceiver, double* pushPtr,  double* pullPtr, 
+                            uint64_t source, uint64_t dest, uint64_t remRank , uint64_t remOffset)
 {
     currConnectionType = actorConnType;
-    maxCapacity = 3;
+    maxCapacity = queueLen;
     curCapacity = maxCapacity;
-    segmentID = segID;
+    queueLocation = 0;
+    
+    this->blockSize = blockSize;
+    this->isSender = isSender;
+    this->isReceiver = isReceiver;
+
+    this->pushPtr = pushPtr;
+    this->pullPtr = pullPtr;
+
     std::memcpy(&srcID, &source, sizeof(srcID));
     std::memcpy(&dstID, &dest, sizeof(dstID));
     remoteRank = remRank;
 
-    initChannel();
+    if(isReceiver)
+        initChannel(remOffset);
 }
-void RemoteChannel::initChannel()
-{
-    //insert check to see if segment exists already 
-    segmentSize = 110 * sizeof(double);
 
-    const gaspi_segment_id_t tempID = segmentID;
-    const gaspi_size_t tempSize = segmentSize;
-    ASSERT (gaspi_segment_create(tempID, tempSize
-                               , GASPI_GROUP_ALL, GASPI_BLOCK
-                               , GASPI_ALLOC_DEFAULT
-                               )
-         );
-    gaspi_pointer_t gasptr_locSeg;
-    ASSERT (gaspi_segment_ptr (tempID, &gasptr_locSeg));
-	localSegmentPointer = (double*)(gasptr_locSeg);
+void RemoteChannel::initChannel(uint64_t remOffset)
+{
+    for(int i = 0; i < maxCapacity; i++)
+    {
+        remoteOffsets.push_back((remOffset * blockSize * maxCapacity * sizeof(double))  + (i * blockSize));
+    }
 }
+
 std::vector<double> RemoteChannel::pullData()
 {   
     //gaspi_printf("In pull\n");
-    ASSERT (gaspi_wait (1, GASPI_BLOCK));
-    if(localSegmentPointer[0] == srcID && localSegmentPointer[1] == dstID)
+    if(pullPtr[1] == srcID && pullPtr[2] == dstID)
     {
         //gaspi_printf("Size: %d\n",(int)localSegmentPointer[2]);
-        std::vector<double> toRet(localSegmentPointer + 3, localSegmentPointer + 3 + (int)localSegmentPointer[2]);
+        std::vector<double> toRet(pullPtr + 3, pullPtr + blockSize);
         //curCapacity++;
+        
+        pullPtr[0] == 0;
+        gpi_util::wait_if_queue_full (1, 1);
+        ASSERT (gaspi_write ( 2, 0
+                        , remoteRank, 1, remoteOffsets[queueLocation]
+                        , sizeof(double), 1, GASPI_BLOCK
+                        )
+            );//mark as dirty
+        
+        
+        queueLocation++;
+        queueLocation %= maxCapacity;
+	    ASSERT (gaspi_wait (1, GASPI_BLOCK));
         return toRet;
     }
     else
@@ -64,24 +80,16 @@ void RemoteChannel::pushData(std::vector<double> &ndata)
     
     if(this->isAvailableToPush())
     {
-        std::vector<double> localCpy {srcID, dstID, (double)ndata.size()};
+        std::vector<double> localCpy {1, srcID, dstID};
         localCpy.insert(localCpy.end(), ndata.begin(), ndata.end());
-        for(int i = 0; i < localCpy.size();  i++)
+        for(int i = 0; i < blockSize;  i++)
         {
-            localSegmentPointer[i] = localCpy[i];
+            (pushPtr + (blockSize*queueLocation))[i] = localCpy[i];
         }
-        ASSERT (gaspi_write_notify ( segmentID, 0
-	                     , remoteRank, segmentID, 0
-	                     , localCpy.size() * sizeof(double), 
-                         1, 1,
-                         1, GASPI_BLOCK
-	                     )
-	         );
-        //data.push(localCpy);
         //curCapacity--;
-        
-	    ASSERT (gaspi_wait (1, GASPI_BLOCK));
         //gaspi_printf("Data pushed\n");
+        queueLocation++;
+        queueLocation %= maxCapacity;
     }
     else
     {
@@ -90,13 +98,16 @@ void RemoteChannel::pushData(std::vector<double> &ndata)
 }
 bool RemoteChannel::isAvailableToPull()
 {
-    
-    return gpi_util::test_notif_or_exit(segmentID, 1, 1);
-    //return dataStale;
-    //return (curCapacity < maxCapacity);
+    gpi_util::wait_if_queue_full (1, 1);
+    ASSERT (gaspi_read ( 2, 0
+                        , remoteRank, 1, remoteOffsets[queueLocation]
+                        , blockSize, 1, GASPI_BLOCK
+                        )
+            );
+    ASSERT (gaspi_wait (1, GASPI_BLOCK));
+    return (pullPtr[0] == 1);
 }
 bool RemoteChannel::isAvailableToPush()
 {
-    return true;
-    //return (curCapacity > 0);
+    return ((pushPtr + (blockSize*queueLocation)) == 0);
 }

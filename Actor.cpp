@@ -85,5 +85,5 @@ std::pair<uint64_t,uint64_t> Actor::decodeGlobID(uint64_t inpGlobId) //static
 {
 	uint64_t procNo = inpGlobId >> 20;
 	uint64_t actNo = inpGlobId & ((1 << 20) - 1);
-	return (std::make_pair(actNo, procNo));
+	return (std::make_pair(procNo, actNo));
 }

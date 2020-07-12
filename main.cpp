@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <cstdint>
 #include <iostream>
+#include <string>
 
 #ifndef ASSERT
 #define ASSERT(ec) gpi_util::success_or_exit(__FILE__,__LINE__,ec)
@@ -18,10 +19,10 @@ int main(int argc, char *argv[])
 
 	ASSERT( gaspi_proc_init(GASPI_BLOCK) );
 
-	int maxVals = 2000;
+	int maxVals = 10;
 	int queueMax = 3;
 
-	ActorGraph ag;
+	ActorGraph ag(maxVals, queueMax);
 
 	ASSERT( gaspi_proc_rank(&rank));
 	ASSERT( gaspi_proc_num(&num) );
@@ -40,16 +41,20 @@ int main(int argc, char *argv[])
 	ag.syncActors();
 	ag.printActors();
 	
-	//ag.pushConnection(0,1);
-	ag.pushConnection(0,Actor::encodeGlobID(1,0));
-	//ag.pushConnection(Actor::encodeGlobID(1,0),Actor::encodeGlobID(1,1));
-	ag.pushConnection(Actor::encodeGlobID(1,0),1);
-	ag.pushConnection(1,Actor::encodeGlobID(1,1));
+	ag.pushConnection(0,1);
+	ag.pushConnection(1,Actor::encodeGlobID(1,0));
+	//ag.pushConnection(0,Actor::encodeGlobID(1,0));
+	//ag.pushConnection(Actor::encodeGlobID(1,0),Actor::encodeGlobID(2,0));
+	//ag.pushConnection(Actor::encodeGlobID(1,0),Actor::encodeGlobID(0,1));
+	ag.pushConnection(Actor::encodeGlobID(1,0),Actor::encodeGlobID(1,1));
+	//ag.pushConnection(Actor::encodeGlobID(1,1),Actor::encodeGlobID(2,1));
+	//ag.pushConnection(Actor::encodeGlobID(1,0),1);
+	//ag.pushConnection(1,Actor::encodeGlobID(1,1));
 	//ag.pushConnection(Actor::encodeGlobID(1,1),Actor::encodeGlobID(2,0));
 	//ag.pushConnection(Actor::encodeGlobID(2,0),Actor::encodeGlobID(2,1));
 
-	ag.makeConnections();
-
+	//ag.makeConnections();
+	/*
 	int i = 0;
 	while(! (localActor1->receivedData && localActor2->receivedData))// && localActor3->receivedData))
 	{
@@ -61,6 +66,13 @@ int main(int argc, char *argv[])
 			std::cout << std::endl;
 	}
 	gaspi_printf("Rank %d done.\n",rank);	
+	*/
+
+	ag.sortConnections();
+	ag.genOffsets();
+	std::string offstr = ag.getOffsetString();
+
+	std::cout << "Rank " <<rank<<" offset string " << offstr << std::endl;
 
 	ASSERT( gaspi_proc_term(GASPI_BLOCK) );
 

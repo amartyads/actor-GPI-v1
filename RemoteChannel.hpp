@@ -16,15 +16,22 @@ public:
     bool isAvailableToPush();
     bool isAvailableToPull();
 
-    int segmentID;
-    int segmentSize;
+    int blockSize;
     double srcID, dstID;
-    double* localSegmentPointer;
+    double* pushPtr;
+    double* pullPtr;
     uint64_t remoteRank;
+    std::vector<uint64_t> remoteOffsets;
     
-    void initChannel();
+    bool isSender;
+    bool isReceiver;
+    int queueLocation;
 
-    RemoteChannel(ActorConnectionType actorConnType, int segID, uint64_t source, uint64_t dest, uint64_t remRank);
+    void initChannel(uint64_t remOffset);
+
+    RemoteChannel(ActorConnectionType actorConnType, int blockSize, int queueLen,
+                            bool isSender, bool isReceiver, double* pushPtr,  double* pullPtr, 
+                            uint64_t source, uint64_t dest, uint64_t remRank , uint64_t remOffset);
 };
 
 #endif

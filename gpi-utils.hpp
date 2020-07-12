@@ -5,6 +5,7 @@
 #include "../local/include/GASPI.h"
 #include "../local/include/GASPI_Ext.h"
 #include <stdlib.h>
+#include <cstdint>
 #include <stdexcept>
 
 namespace gpi_util
@@ -16,6 +17,19 @@ namespace gpi_util
 			gaspi_printf("Assertions failed in $s[%i]:%d\n",file,line,ec);
 			exit(EXIT_FAILURE);
 		}
+	}
+	static gaspi_pointer_t create_segment_return_ptr(int segmentID, uint64_t segmentSize)
+	{
+		const gaspi_segment_id_t tempID = segmentID;
+		const gaspi_size_t tempSize = segmentSize;
+		success_or_exit(__FILE__, __LINE__, gaspi_segment_create(tempID, tempSize
+								, GASPI_GROUP_ALL, GASPI_BLOCK
+								, GASPI_ALLOC_DEFAULT
+								)
+			);
+		gaspi_pointer_t gasptr_locSeg;
+		success_or_exit(__FILE__,__LINE__,gaspi_segment_ptr (tempID, &gasptr_locSeg));
+		return gasptr_locSeg;
 	}
 	static void wait_if_queue_full ( const gaspi_queue_id_t queue_id
                         , const gaspi_number_t request_size
