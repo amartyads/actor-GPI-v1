@@ -6,9 +6,9 @@
 #include "RemoteChannel.hpp"
 
 #include <stdexcept>
+#include <iostream>
 #include <queue>
 #include <vector>
-#include <cstring>
 #include <cstdint>
 
 #ifndef ASSERT
@@ -31,32 +31,45 @@ RemoteChannel::RemoteChannel(ActorConnectionType actorConnType, int blockSize, i
     this->pushPtr = pushPtr;
     this->pullPtr = pullPtr;
 
-    std::memcpy(&srcID, &source, sizeof(srcID));
-    std::memcpy(&dstID, &dest, sizeof(dstID));
+    srcID = (double) source;
+    dstID = (double) dest;
     remoteRank = remRank;
 
-    if(isReceiver)
-        initChannel(remOffset);
+    initChannel(remOffset);
 }
 
 void RemoteChannel::initChannel(uint64_t remOffset)
 {
-    for(int i = 0; i < maxCapacity; i++)
+    if(isReceiver)
     {
-        remoteOffsets.push_back((remOffset * blockSize * maxCapacity * sizeof(double))  + (i * blockSize));
+        for(int i = 0; i < maxCapacity; i++)
+        {
+            remoteOffsets.push_back((remOffset * blockSize * maxCapacity * sizeof(double))  + (i * blockSize));
+            if(srcID == 2097153)
+                std::cout<<"Offset val " << (remOffset * blockSize * maxCapacity * sizeof(double))  + (i * blockSize) <<std::endl;
+        }
+    }
+    if(isSender)
+    {
+        for(int i = 0; i < maxCapacity; i++)
+        {
+            (pushPtr + (blockSize*i))[0] = 0;
+        }
     }
 }
 
 std::vector<double> RemoteChannel::pullData()
 {   
     //gaspi_printf("In pull\n");
+    //std::cout << std::fixed << srcID << " " <<dstID << std::endl;
+    //std::cout << std::fixed << pullPtr[1] << " " <<pullPtr[2] << std::endl;
     if(pullPtr[1] == srcID && pullPtr[2] == dstID)
     {
         //gaspi_printf("Size: %d\n",(int)localSegmentPointer[2]);
         std::vector<double> toRet(pullPtr + 3, pullPtr + blockSize);
         //curCapacity++;
         
-        pullPtr[0] == 0;
+        pullPtr[0] = 0;
         gpi_util::wait_if_queue_full (1, 1);
         ASSERT (gaspi_write ( 2, 0
                         , remoteRank, 1, remoteOffsets[queueLocation]
@@ -77,37 +90,55 @@ std::vector<double> RemoteChannel::pullData()
 }
 void RemoteChannel::pushData(std::vector<double> &ndata)
 {
-    
-    if(this->isAvailableToPush())
-    {
+    if(srcID == 2097153)
+        gaspi_printf("In push\n");
+    //if(this->isAvailableToPush())
+    //{
         std::vector<double> localCpy {1, srcID, dstID};
         localCpy.insert(localCpy.end(), ndata.begin(), ndata.end());
         for(int i = 0; i < blockSize;  i++)
         {
             (pushPtr + (blockSize*queueLocation))[i] = localCpy[i];
+            if(srcID == 2097153)
+                std::cout <<std::fixed<< (pushPtr + (blockSize*queueLocation))[i] << ",";
         }
         //curCapacity--;
+        if(srcID == 2097153)
+        {
+            std::cout << std::endl;
+            std::cout << (blockSize * queueLocation) << std::endl;
+        }
         //gaspi_printf("Data pushed\n");
         queueLocation++;
         queueLocation %= maxCapacity;
-    }
-    else
-    {
-        throw std::runtime_error("Too much data in channel");
-    }
+    //}
+    //else
+    //{
+    //    throw std::runtime_error("Too much data in channel");
+    //}
 }
 bool RemoteChannel::isAvailableToPull()
 {
+    if(srcID == 2097153)
+        gaspi_printf("In availabletopull\n");
     gpi_util::wait_if_queue_full (1, 1);
     ASSERT (gaspi_read ( 2, 0
                         , remoteRank, 1, remoteOffsets[queueLocation]
-                        , blockSize, 1, GASPI_BLOCK
+                        , blockSize * sizeof(double), 1, GASPI_BLOCK
                         )
             );
     ASSERT (gaspi_wait (1, GASPI_BLOCK));
+    
+	//gpi_util::wait_for_flush_queues();
+    if(srcID == 2097153)
+    {
+        std::cout << std::fixed << pullPtr[0] << " " <<pullPtr[1] << " " <<pullPtr[2] << std::endl;
+        std::cout << remoteOffsets[queueLocation] << std::endl;
+    }
     return (pullPtr[0] == 1);
 }
 bool RemoteChannel::isAvailableToPush()
 {
-    return ((pushPtr + (blockSize*queueLocation)) == 0);
+    //gaspi_printf("In availabletopush\n");
+    return ((pushPtr + (blockSize*queueLocation))[0] == 0);
 }

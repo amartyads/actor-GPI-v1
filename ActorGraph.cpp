@@ -9,6 +9,8 @@
 #include "Channel.hpp"
 #include "LocalChannel.hpp"
 #include "RemoteChannel.hpp"
+
+#include <iostream>
 #include <stdlib.h>
 #include <inttypes.h>
 #include <algorithm>
@@ -322,6 +324,10 @@ void ActorGraph::makeConnections()
 				//get actors
 				Actor* ac1 = getLocalActor(connectionList[i].first);
 				//establish channel
+				if(connectionList[i].first == 2097153)
+				{
+					std::cout << "Offset" << offsetVals[i] << " and number " << ((3+dataBlockSize) * dataQueueLen * sizeof(double) * offsetVals[i]) <<std::endl;
+				}
 				Channel* channel = new RemoteChannel(connectionTypeList[i], 3+dataBlockSize, dataQueueLen,
 													true, false, (pushSegmentPtr + ((3+dataBlockSize) * dataQueueLen * sizeof(double) * offsetVals[i])), NULL, 
 													connectionList[i].first, connectionList[i].second,
@@ -338,10 +344,14 @@ void ActorGraph::makeConnections()
 				//get actors
 				Actor* ac2 = getLocalActor(connectionList[i].second);
 				//establish channel
+				if(connectionList[i].first == 2097153)
+				{
+					std::cout << "Offset" << offsetVals[i] <<std::endl;
+				}
 				Channel* channel = new RemoteChannel(connectionTypeList[i], 3+dataBlockSize, dataQueueLen,
 													false, true, NULL, pullSegmentPtr, 
 													connectionList[i].first, connectionList[i].second,
-													Actor::decodeGlobID(connectionList[i].second).first, offsetVals[i]);
+													Actor::decodeGlobID(connectionList[i].first).first, offsetVals[i]);
 				//make ports
 				InPort* inPort = new InPort(channel);
 

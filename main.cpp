@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
 
 	ASSERT( gaspi_proc_init(GASPI_BLOCK) );
 
-	int maxVals = 10;
+	int maxVals = 2;
 	int queueMax = 3;
 
 	ActorGraph ag(maxVals, queueMax);
@@ -41,22 +41,25 @@ int main(int argc, char *argv[])
 	ag.syncActors();
 	ag.printActors();
 	
-	ag.pushConnection(0,1);
-	ag.pushConnection(1,Actor::encodeGlobID(1,0));
-	//ag.pushConnection(0,Actor::encodeGlobID(1,0));
-	//ag.pushConnection(Actor::encodeGlobID(1,0),Actor::encodeGlobID(2,0));
-	//ag.pushConnection(Actor::encodeGlobID(1,0),Actor::encodeGlobID(0,1));
-	ag.pushConnection(Actor::encodeGlobID(1,0),Actor::encodeGlobID(1,1));
-	//ag.pushConnection(Actor::encodeGlobID(1,1),Actor::encodeGlobID(2,1));
+	//ag.pushConnection(0,1);
+	//ag.pushConnection(1,Actor::encodeGlobID(1,0));
+	ag.pushConnection(0,Actor::encodeGlobID(1,0));
+	ag.pushConnection(Actor::encodeGlobID(1,0),Actor::encodeGlobID(2,0));
+	//ag.pushConnection(Actor::encodeGlobID(1,0),Actor::encodeGlobID(1,1));
 	//ag.pushConnection(Actor::encodeGlobID(1,0),1);
 	//ag.pushConnection(1,Actor::encodeGlobID(1,1));
 	//ag.pushConnection(Actor::encodeGlobID(1,1),Actor::encodeGlobID(2,0));
-	//ag.pushConnection(Actor::encodeGlobID(2,0),Actor::encodeGlobID(2,1));
+	ag.pushConnection(Actor::encodeGlobID(2,0),Actor::encodeGlobID(3,0));
+	ag.pushConnection(Actor::encodeGlobID(3,0),Actor::encodeGlobID(3,1));
+	ag.pushConnection(Actor::encodeGlobID(3,1),Actor::encodeGlobID(2,1));
+	ag.pushConnection(Actor::encodeGlobID(2,1),Actor::encodeGlobID(1,1));
+	ag.pushConnection(Actor::encodeGlobID(1,1),1);
 
 	ag.makeConnections();
 	
 	int i = 0;
-	while(! (localActor1->receivedData && localActor2->receivedData))// && localActor3->receivedData))
+	//while(! (localActor1->receivedData && localActor2->receivedData))// && localActor3->receivedData))
+	while(i < 10)
 	{
 		
 		gaspi_printf("Run %d from rank %d\n",i++,rank);
@@ -67,7 +70,9 @@ int main(int argc, char *argv[])
 	}
 	gaspi_printf("Rank %d done.\n",rank);	
 	
+	gpi_util::wait_for_flush_queues();
 
+	ASSERT (gaspi_barrier (GASPI_GROUP_ALL, GASPI_BLOCK));
 	//ag.sortConnections();
 	//ag.genOffsets();
 	//std::string offstr = ag.getOffsetString();

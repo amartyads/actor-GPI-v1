@@ -31,6 +31,17 @@ namespace gpi_util
 		success_or_exit(__FILE__,__LINE__,gaspi_segment_ptr (tempID, &gasptr_locSeg));
 		return gasptr_locSeg;
 	}
+	static void wait_for_flush_queues()
+	{
+		gaspi_number_t queue_num;
+		success_or_exit(__FILE__, __LINE__, gaspi_queue_num(&queue_num));
+		gaspi_queue_id_t queue = 0;
+		while(queue < queue_num)
+		{
+			success_or_exit(__FILE__, __LINE__, gaspi_wait(queue, GASPI_BLOCK));
+			++queue;
+		}
+	}
 	static void wait_if_queue_full ( const gaspi_queue_id_t queue_id
                         , const gaspi_number_t request_size
                         )
