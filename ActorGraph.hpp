@@ -23,6 +23,11 @@ public:
 	std::vector<uint64_t> offsetVals;
 	int dataBlockSize, dataQueueLen;
 	
+	double* pushSegmentPtr;
+	double* pullSegmentPtr;
+	uint64_t localPushSegmentSize;
+	uint64_t localPullSegmentSize;
+	
 	Actor* getLocalActor(uint64_t globID);
 	Actor* getLocalActor(std::string actName);
 
@@ -48,4 +53,5 @@ public:
 	void addActor(Actor* newActor);
 	void syncActors();
 	void printActors();
+	void printPushSegment();
 };

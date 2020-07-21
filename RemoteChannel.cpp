@@ -44,9 +44,9 @@ void RemoteChannel::initChannel(uint64_t remOffset)
     {
         for(int i = 0; i < maxCapacity; i++)
         {
-            remoteOffsets.push_back((remOffset * blockSize * maxCapacity * sizeof(double))  + (i * blockSize));
-            if(srcID == 2097153)
-                std::cout<<"Offset val " << (remOffset * blockSize * maxCapacity * sizeof(double))  + (i * blockSize) <<std::endl;
+            remoteOffsets.push_back((remOffset * blockSize * maxCapacity)  + (i * blockSize));
+            if(dstID == 1)
+                std::cout<<"Offset val " << (remOffset * blockSize * maxCapacity)  + (i * blockSize) <<std::endl;
         }
     }
     if(isSender)
@@ -72,7 +72,7 @@ std::vector<double> RemoteChannel::pullData()
         pullPtr[0] = 0;
         gpi_util::wait_if_queue_full (1, 1);
         ASSERT (gaspi_write ( 2, 0
-                        , remoteRank, 1, remoteOffsets[queueLocation]
+                        , remoteRank, 1, remoteOffsets[queueLocation]*sizeof(double)
                         , sizeof(double), 1, GASPI_BLOCK
                         )
             );//mark as dirty
@@ -90,8 +90,10 @@ std::vector<double> RemoteChannel::pullData()
 }
 void RemoteChannel::pushData(std::vector<double> &ndata)
 {
-    if(srcID == 2097153)
-        gaspi_printf("In push\n");
+    if(srcID == 1048576)
+        std::cout << "1048576 pushptr" << pushPtr << std::endl;
+    if(srcID == 1048577)
+        std::cout << "1048577 pushptr" << pushPtr << std::endl;
     //if(this->isAvailableToPush())
     //{
         std::vector<double> localCpy {1, srcID, dstID};
@@ -99,11 +101,11 @@ void RemoteChannel::pushData(std::vector<double> &ndata)
         for(int i = 0; i < blockSize;  i++)
         {
             (pushPtr + (blockSize*queueLocation))[i] = localCpy[i];
-            if(srcID == 2097153)
+            if(srcID == 1048577)
                 std::cout <<std::fixed<< (pushPtr + (blockSize*queueLocation))[i] << ",";
         }
         //curCapacity--;
-        if(srcID == 2097153)
+        if(srcID == 1048577)
         {
             std::cout << std::endl;
             std::cout << (blockSize * queueLocation) << std::endl;
@@ -119,21 +121,22 @@ void RemoteChannel::pushData(std::vector<double> &ndata)
 }
 bool RemoteChannel::isAvailableToPull()
 {
-    if(srcID == 2097153)
+    if(srcID == 1048577)
         gaspi_printf("In availabletopull\n");
-    gpi_util::wait_if_queue_full (1, 1);
+    gpi_util::wait_if_queue_full (2, 1);
     ASSERT (gaspi_read ( 2, 0
-                        , remoteRank, 1, remoteOffsets[queueLocation]
-                        , blockSize * sizeof(double), 1, GASPI_BLOCK
+                        , remoteRank, 1, remoteOffsets[queueLocation]*sizeof(double)
+                        , blockSize * sizeof(double), 2, GASPI_BLOCK
                         )
             );
-    ASSERT (gaspi_wait (1, GASPI_BLOCK));
+    ASSERT (gaspi_wait (2, GASPI_BLOCK));
     
 	//gpi_util::wait_for_flush_queues();
-    if(srcID == 2097153)
+    //if(srcID == 2097153)
     {
         std::cout << std::fixed << pullPtr[0] << " " <<pullPtr[1] << " " <<pullPtr[2] << std::endl;
-        std::cout << remoteOffsets[queueLocation] << std::endl;
+        //std::cout << queueLocation << std::endl;
+        //std::cout << remoteOffsets[queueLocation] << std::endl;
     }
     return (pullPtr[0] == 1);
 }

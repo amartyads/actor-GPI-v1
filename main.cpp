@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
 
 	ASSERT( gaspi_proc_init(GASPI_BLOCK) );
 
-	int maxVals = 2;
+	int maxVals = 1;
 	int queueMax = 3;
 
 	ActorGraph ag(maxVals, queueMax);
@@ -45,21 +45,22 @@ int main(int argc, char *argv[])
 	//ag.pushConnection(1,Actor::encodeGlobID(1,0));
 	ag.pushConnection(0,Actor::encodeGlobID(1,0));
 	ag.pushConnection(Actor::encodeGlobID(1,0),Actor::encodeGlobID(2,0));
+	ag.pushConnection(Actor::encodeGlobID(2,0),Actor::encodeGlobID(2,1));
 	//ag.pushConnection(Actor::encodeGlobID(1,0),Actor::encodeGlobID(1,1));
 	//ag.pushConnection(Actor::encodeGlobID(1,0),1);
 	//ag.pushConnection(1,Actor::encodeGlobID(1,1));
 	//ag.pushConnection(Actor::encodeGlobID(1,1),Actor::encodeGlobID(2,0));
-	ag.pushConnection(Actor::encodeGlobID(2,0),Actor::encodeGlobID(3,0));
-	ag.pushConnection(Actor::encodeGlobID(3,0),Actor::encodeGlobID(3,1));
-	ag.pushConnection(Actor::encodeGlobID(3,1),Actor::encodeGlobID(2,1));
+	//ag.pushConnection(Actor::encodeGlobID(2,0),Actor::encodeGlobID(3,0));
+	//ag.pushConnection(Actor::encodeGlobID(3,0),Actor::encodeGlobID(3,1));
+	//ag.pushConnection(Actor::encodeGlobID(3,1),Actor::encodeGlobID(2,1));
 	ag.pushConnection(Actor::encodeGlobID(2,1),Actor::encodeGlobID(1,1));
 	ag.pushConnection(Actor::encodeGlobID(1,1),1);
 
 	ag.makeConnections();
 	
 	int i = 0;
-	//while(! (localActor1->receivedData && localActor2->receivedData))// && localActor3->receivedData))
-	while(i < 10)
+	while(! (localActor1->receivedData && localActor2->receivedData))// && localActor3->receivedData))
+	//while(i < 7)
 	{
 		
 		gaspi_printf("Run %d from rank %d\n",i++,rank);
@@ -67,6 +68,7 @@ int main(int argc, char *argv[])
 		gaspi_printf("Runtime from rank %d: %lf\n",rank,rt);
 		//if(rank == 0)
 			std::cout << std::endl;
+		//ASSERT (gaspi_barrier (GASPI_GROUP_ALL, GASPI_BLOCK));
 	}
 	gaspi_printf("Rank %d done.\n",rank);	
 	

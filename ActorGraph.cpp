@@ -290,11 +290,9 @@ void ActorGraph::makeConnections()
 
 	genOffsets();
 	
-	uint64_t localPushSegmentSize = dataBlocksInSegment[rank] * (3+dataBlockSize) * dataQueueLen * sizeof(double);
-	uint64_t localPullSegmentSize = (3+dataBlockSize) * sizeof(double);
+	localPushSegmentSize = dataBlocksInSegment[rank] * (3+dataBlockSize) * dataQueueLen * sizeof(double);
+	localPullSegmentSize = (3+dataBlockSize) * sizeof(double);
 
-	double* pushSegmentPtr;
-	double* pullSegmentPtr;
 	pushSegmentPtr = (double*) (gpi_util::create_segment_return_ptr(1, localPushSegmentSize));
 	pullSegmentPtr = (double*) (gpi_util::create_segment_return_ptr(2, localPullSegmentSize));
 	
@@ -324,12 +322,12 @@ void ActorGraph::makeConnections()
 				//get actors
 				Actor* ac1 = getLocalActor(connectionList[i].first);
 				//establish channel
-				if(connectionList[i].first == 2097153)
+				if(connectionList[i].second == 1)
 				{
-					std::cout << "Offset" << offsetVals[i] << " and number " << ((3+dataBlockSize) * dataQueueLen * sizeof(double) * offsetVals[i]) <<std::endl;
+					std::cout << "Offset" << offsetVals[i] << " and number " << ((3+dataBlockSize) * dataQueueLen * offsetVals[i]) <<std::endl;
 				}
 				Channel* channel = new RemoteChannel(connectionTypeList[i], 3+dataBlockSize, dataQueueLen,
-													true, false, (pushSegmentPtr + ((3+dataBlockSize) * dataQueueLen * sizeof(double) * offsetVals[i])), NULL, 
+													true, false, (pushSegmentPtr + ((3+dataBlockSize) * dataQueueLen * offsetVals[i])), NULL, 
 													connectionList[i].first, connectionList[i].second,
 													Actor::decodeGlobID(connectionList[i].second).first, offsetVals[i]);
 				//make ports
@@ -344,7 +342,7 @@ void ActorGraph::makeConnections()
 				//get actors
 				Actor* ac2 = getLocalActor(connectionList[i].second);
 				//establish channel
-				if(connectionList[i].first == 2097153)
+				if(connectionList[i].second == 1)
 				{
 					std::cout << "Offset" << offsetVals[i] <<std::endl;
 				}
@@ -366,6 +364,22 @@ void ActorGraph::makeConnections()
 	}
 	
 	ASSERT (gaspi_barrier (GASPI_GROUP_ALL, GASPI_BLOCK));
+}
+
+void ActorGraph::printPushSegment()
+{
+	std::stringstream ss;
+	ss << "Printing push segment at rank " << rank << std::endl;
+	for(int i = 0; i < localPushSegmentSize / sizeof(double); i++)
+	{
+		ss << pushSegmentPtr[i];
+		if(pushSegmentPtr[i] != 0.0)
+			ss << "(" << i << ")";
+		ss << ",";
+
+	}
+	ss << std::endl;
+	std::cout << (ss.str());
 }
 
 void ActorGraph::genOffsets()
@@ -407,6 +421,7 @@ double ActorGraph::run()
 	{
 		localActorRefList[i]->act();
 	}
+	printPushSegment();
 
 	auto end = std::chrono::steady_clock::now();
 	double runTime = std::chrono::duration<double, std::ratio<1>>(end - start).count();
