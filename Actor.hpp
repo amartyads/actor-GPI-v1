@@ -29,19 +29,16 @@ public:
 	void addInPort(InPort* inPort);
 	void addOutPort(OutPort* outPort);
 
-	Actor(std::string othname, uint64_t othrank, uint64_t othsrno)
-	{
-		name = othname;
-		rank = othrank;
-		srno = othsrno;
-		globID = Actor::encodeGlobID(othrank, othsrno);
-		noTimesRan = 0;
-	}
-	Actor(uint64_t rank, uint64_t srno) : Actor("A-"+std::to_string(rank)+"-"+std::to_string(srno), rank, srno) { }
+	Actor(std::string othname, uint64_t othrank, uint64_t othsrno);
+	Actor(uint64_t rank, uint64_t srno);
 
+	virtual ~Actor();
+	Actor(Actor &other) = delete;
+	Actor & operator=(Actor &other) = delete;
 	//temps
-	void act();
-	bool receivedData = false;
+	virtual void act() = 0;
+	virtual bool finished() = 0;
+	bool receivedData;
 	//statics
 	static uint64_t encodeGlobID(uint64_t procNo, uint64_t actNo);
 	static std::pair<uint64_t,uint64_t> decodeGlobID(uint64_t inpGlobId);

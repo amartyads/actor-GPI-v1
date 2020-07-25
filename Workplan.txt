@@ -1,8 +1,11 @@
-ActorGraph
+Added
 -local actorgraphs
 -store references to actors
 -make connections
 -iterate through actors
+-remote comms
+-abstract actor
 
 To add
+-gpi queue ring
 -labels to ports

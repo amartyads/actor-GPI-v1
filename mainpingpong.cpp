@@ -2,6 +2,7 @@
 #include "../local/include/GASPI_Ext.h"
 #include "gpi-utils.hpp"
 #include "Actor.hpp"
+#include "PingPongActor.hpp"
 #include "ActorGraph.hpp"
 #include <stdlib.h>
 #include <cstdint>
@@ -27,20 +28,19 @@ int main(int argc, char *argv[])
 	ASSERT( gaspi_proc_rank(&rank));
 	ASSERT( gaspi_proc_num(&num) );
 
-	Actor *localActor1 = new Actor(rank,0);
-	Actor *localActor2 = new Actor(rank,1);
+	PingPongActor *localActor1 = new PingPongActor(rank,0);
+	PingPongActor *localActor2 = new PingPongActor(rank,1);
 	//Actor *localActor3 = new Actor(rank,2);
 
 	//ag.addActor(localActor3);
 	ag.addActor(localActor1);
 	ag.addActor(localActor2);
 
-
 	ASSERT (gaspi_barrier (GASPI_GROUP_ALL, GASPI_BLOCK));
 
 	ag.syncActors();
 	ag.printActors();
-	
+
 	//ag.pushConnection(0,1);
 	//ag.pushConnection(1,Actor::encodeGlobID(1,0));
 	ag.pushConnection(0,Actor::encodeGlobID(1,0));
@@ -55,14 +55,14 @@ int main(int argc, char *argv[])
 	//ag.pushConnection(Actor::encodeGlobID(3,1),Actor::encodeGlobID(2,1));
 	ag.pushConnection(Actor::encodeGlobID(2,1),Actor::encodeGlobID(1,1));
 	ag.pushConnection(Actor::encodeGlobID(1,1),1);
-
-	ag.makeConnections();
 	
+	ag.makeConnections();
+
+
 	int i = 0;
-	while(! (localActor1->receivedData && localActor2->receivedData))// && localActor3->receivedData))
+	while(! (localActor1->finished() && localActor2->finished()))// && localActor3->receivedData))
 	//while(i < 7)
 	{
-		
 		gaspi_printf("Run %d from rank %d\n",i++,rank);
 		double rt = ag.run();
 		gaspi_printf("Runtime from rank %d: %lf\n",rank,rt);

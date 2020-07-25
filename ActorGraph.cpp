@@ -205,7 +205,7 @@ Actor* ActorGraph::getLocalActor(uint64_t globID)
 		if(localActorRefList[i]->globID == globID)
 			return localActorRefList[i];
 	}
-	return (new Actor("Not found",0,0));
+	return nullptr;
 }
 Actor* ActorGraph::getLocalActor(std::string actName)
 {
@@ -214,17 +214,17 @@ Actor* ActorGraph::getLocalActor(std::string actName)
 		if(localActorRefList[i]->name == actName)
 			return localActorRefList[i];
 	}
-	return (new Actor("Not found",0,0));
+	return nullptr;
 }
 bool ActorGraph::isLocalActor(uint64_t globID)
 {
-	if(getLocalActor(globID)->name == "Not found")
+	if(getLocalActor(globID) == nullptr)
 		return false;
 	return true;
 }
 bool ActorGraph::isLocalActor(std::string actName)
 {
-	if(getLocalActor(actName)->name == "Not found")
+	if(getLocalActor(actName) == nullptr)
 		return false;
 	return true;
 }
@@ -246,7 +246,6 @@ ActorConnectionType ActorGraph::getActorConnectionType(uint64_t globIDSrcActor, 
 {
 	if(!isRegisteredActor(globIDSrcActor) || !isRegisteredActor(globIDDestActor))
 		return ActorConnectionType::ACTOR_DNE;										//to fix
-	
 	bool srcLoc = isLocalActor(globIDSrcActor);
 	bool destLoc = isLocalActor(globIDDestActor);
 	if(srcLoc && destLoc)
@@ -278,7 +277,7 @@ void ActorGraph::makeConnections()
 {
 	
 	ASSERT (gaspi_barrier (GASPI_GROUP_ALL, GASPI_BLOCK));
-	
+
 	sortConnections();
 
 	std::vector<ActorConnectionType> connectionTypeList;
@@ -289,7 +288,7 @@ void ActorGraph::makeConnections()
 	}
 
 	genOffsets();
-	
+
 	localPushSegmentSize = dataBlocksInSegment[rank] * (3+dataBlockSize) * dataQueueLen * sizeof(double);
 	localPullSegmentSize = (3+dataBlockSize) * sizeof(double);
 
