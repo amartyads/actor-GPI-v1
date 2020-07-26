@@ -42,6 +42,19 @@ namespace gpi_util
 			++queue;
 		}
 	}
+	static void wait_for_queue_entries(gaspi_queue_id_t* queue, int wanted_entries)
+	{
+		gaspi_number_t queue_size_max, queue_size, queue_num;
+		success_or_exit(__FILE__, __LINE__, gaspi_queue_size_max(&queue_size_max));
+		success_or_exit(__FILE__, __LINE__, gaspi_queue_size(*queue, &queue_size));
+		success_or_exit(__FILE__, __LINE__, gaspi_queue_num(&queue_num));
+
+		if(!(queue_size + wanted_entries <= queue_size_max))
+		{
+			*queue = (*queue + 1) % queue_num;
+			success_or_exit(__FILE__, __LINE__, gaspi_wait(*queue, GASPI_BLOCK));
+		}
+	}
 	static void wait_if_queue_full ( const gaspi_queue_id_t queue_id
                         , const gaspi_number_t request_size
                         )
