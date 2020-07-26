@@ -52,9 +52,6 @@ void ActorGraph::syncActors()
 	int actorElemSize = sizeof(uint64_t);
 	//int remoteNoActors[num];
 
-	const gaspi_queue_id_t queue_id_size = 0;
-	const gaspi_queue_id_t queue_id_data = 1;
-
 	//initialize segment for sending segsize
 	//initialize segment for receiving segsize
 	const gaspi_segment_id_t segment_id_loc_size = 0;
@@ -77,7 +74,7 @@ void ActorGraph::syncActors()
 	ASSERT (gaspi_segment_ptr (segment_id_loc_size, &srcgasp));
 	ASSERT (gaspi_segment_ptr (segment_id_rem_size, &dstgasp));
 	
-	const gaspi_queue_id_t queue_id = 0;
+	gaspi_queue_id_t queue_id = 0;
 	 
 	int *locSize = (int *)(srcgasp);
 	int *remoteNoActors = (int *)(dstgasp);
@@ -111,12 +108,12 @@ void ActorGraph::syncActors()
 		if(i == rank)
 			continue;
 		//read no of actors
-		gpi_util::wait_if_queue_full (queue_id_size, 1);
+		gpi_util::wait_for_queue_entries(&queue_id, 1);
  		
  		const gaspi_offset_t offset_dst = i * sizeof (int);
       	ASSERT (gaspi_read ( segment_id_rem_size, offset_dst
                          , i, segment_id_loc_size, 0
-                         , sizeof (int), queue_id_size, GASPI_BLOCK
+                         , sizeof (int), queue_id, GASPI_BLOCK
                          )
              );
       	//maxSize = maxSize > *remSize? maxSize: *remSize;
@@ -124,8 +121,8 @@ void ActorGraph::syncActors()
       	//gaspi_printf("Read size: %d\n", *remSize);
     }
 
-
-	ASSERT (gaspi_wait (queue_id_size, GASPI_BLOCK));
+	gpi_util::wait_for_flush_queues();
+	//ASSERT (gaspi_wait (queue_id_size, GASPI_BLOCK));
 
 	int segSize = 0;
 	for(int i = 0; i < num; i++)
@@ -158,17 +155,20 @@ void ActorGraph::syncActors()
 		const gaspi_size_t segment_size_cur_rem_arr = actorElemSize * remoteNoActors[i];
 		const gaspi_offset_t loc_segment_offset = localOffset;
 
-		gpi_util::wait_if_queue_full (queue_id_data, 1);
+		gpi_util::wait_for_queue_entries(&queue_id, 1);
 		ASSERT (gaspi_read ( segment_id_rem_array, loc_segment_offset
 	                     , i, segment_id_loc_array, 0
-	                     , segment_size_cur_rem_arr, queue_id_data, GASPI_BLOCK
+	                     , segment_size_cur_rem_arr, queue_id, GASPI_BLOCK
 	                     )
 	         );
 		localOffset += actorElemSize * remoteNoActors[i];
 
 		
 	}
-	ASSERT (gaspi_wait (queue_id_data, GASPI_BLOCK));
+
+	gpi_util::wait_for_flush_queues();
+
+	//ASSERT (gaspi_wait (queue_id_data, GASPI_BLOCK));
 
 	//use segmentPointer and push back actors
 	for(int j = 0; j < (segSize/actorElemSize); j++)
