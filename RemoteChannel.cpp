@@ -47,8 +47,6 @@ void RemoteChannel::initChannel(uint64_t remOffset)
         for(int i = 0; i < maxCapacity; i++)
         {
             remoteOffsets.push_back((remOffset * blockSize * maxCapacity)  + (i * blockSize));
-            if(dstID == 1)
-                std::cout<<"Offset val " << (remOffset * blockSize * maxCapacity)  + (i * blockSize) <<std::endl;
         }
     }
     if(isSender)
@@ -93,10 +91,6 @@ std::vector<double> RemoteChannel::pullData()
 }
 void RemoteChannel::pushData(std::vector<double> &ndata)
 {
-    if(srcID == 1048576)
-        std::cout << "1048576 pushptr" << pushPtr << std::endl;
-    if(srcID == 1048577)
-        std::cout << "1048577 pushptr" << pushPtr << std::endl;
     //if(this->isAvailableToPush())
     //{
         std::vector<double> localCpy {1, srcID, dstID};
@@ -106,12 +100,6 @@ void RemoteChannel::pushData(std::vector<double> &ndata)
             (pushPtr + (blockSize*queueLocation))[i] = localCpy[i];
             if(srcID == 1048577)
                 std::cout <<std::fixed<< (pushPtr + (blockSize*queueLocation))[i] << ",";
-        }
-        //curCapacity--;
-        if(srcID == 1048577)
-        {
-            std::cout << std::endl;
-            std::cout << (blockSize * queueLocation) << std::endl;
         }
         //gaspi_printf("Data pushed\n");
         queueLocation++;
@@ -124,8 +112,6 @@ void RemoteChannel::pushData(std::vector<double> &ndata)
 }
 bool RemoteChannel::isAvailableToPull()
 {
-    if(srcID == 1048577)
-        gaspi_printf("In availabletopull\n");
     gpi_util::wait_for_queue_entries(&queue_id, 1);
     ASSERT (gaspi_read ( 2, 0
                         , remoteRank, 1, remoteOffsets[queueLocation]*sizeof(double)
@@ -133,14 +119,6 @@ bool RemoteChannel::isAvailableToPull()
                         )
             );
     ASSERT (gaspi_wait (queue_id, GASPI_BLOCK));
-    
-	//gpi_util::wait_for_flush_queues();
-    //if(srcID == 2097153)
-    {
-        std::cout << std::fixed << pullPtr[0] << " " <<pullPtr[1] << " " <<pullPtr[2] << std::endl;
-        //std::cout << queueLocation << std::endl;
-        //std::cout << remoteOffsets[queueLocation] << std::endl;
-    }
     return (pullPtr[0] == 1);
 }
 bool RemoteChannel::isAvailableToPush()

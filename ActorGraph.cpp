@@ -321,10 +321,6 @@ void ActorGraph::makeConnections()
 				//get actors
 				Actor* ac1 = getLocalActor(connectionList[i].first);
 				//establish channel
-				if(connectionList[i].second == 1)
-				{
-					std::cout << "Offset" << offsetVals[i] << " and number " << ((3+dataBlockSize) * dataQueueLen * offsetVals[i]) <<std::endl;
-				}
 				Channel* channel = new RemoteChannel(connectionTypeList[i], 3+dataBlockSize, dataQueueLen,
 													true, false, (pushSegmentPtr + ((3+dataBlockSize) * dataQueueLen * offsetVals[i])), NULL, 
 													connectionList[i].first, connectionList[i].second,
@@ -341,10 +337,6 @@ void ActorGraph::makeConnections()
 				//get actors
 				Actor* ac2 = getLocalActor(connectionList[i].second);
 				//establish channel
-				if(connectionList[i].second == 1)
-				{
-					std::cout << "Offset" << offsetVals[i] <<std::endl;
-				}
 				Channel* channel = new RemoteChannel(connectionTypeList[i], 3+dataBlockSize, dataQueueLen,
 													false, true, NULL, pullSegmentPtr, 
 													connectionList[i].first, connectionList[i].second,
@@ -420,7 +412,7 @@ double ActorGraph::run()
 	{
 		localActorRefList[i]->act();
 	}
-	printPushSegment();
+	//printPushSegment();
 
 	auto end = std::chrono::steady_clock::now();
 	double runTime = std::chrono::duration<double, std::ratio<1>>(end - start).count();
