@@ -16,7 +16,7 @@ Actor::Actor(std::string othname, uint64_t othrank, uint64_t othsrno)
 	srno = othsrno;
 	globID = Actor::encodeGlobID(othrank, othsrno);
 	noTimesRan = 0;
-	receivedData = false;
+	finished = false;
 }
 Actor::Actor(uint64_t rank, uint64_t srno) : Actor("A-"+std::to_string(rank)+"-"+std::to_string(srno), rank, srno) { }
 

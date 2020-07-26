@@ -19,7 +19,7 @@ void PingPongActor::act()
 		if(noTimesRan == 0)
 		{
 			std::cout << "Actor 0 commencing pingpong" <<std::endl;
-			receivedData = true;
+			finished = true;
 			std::vector<double> data {42.42};
 			for(int j = 0; j < outPortList.size(); j++)
 			{
@@ -56,7 +56,7 @@ void PingPongActor::act()
 				if(outPortList[j]->isAvailable())
 					outPortList[j]->write(data);
 			}
-			receivedData = true;
+			finished = true;
 		}
 		else
 		{
@@ -65,9 +65,4 @@ void PingPongActor::act()
 		
 	}
 	
-}
-
-bool PingPongActor::finished()
-{
-    return Actor::receivedData;
 }

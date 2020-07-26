@@ -37,8 +37,7 @@ public:
 	Actor & operator=(Actor &other) = delete;
 	//temps
 	virtual void act() = 0;
-	virtual bool finished() = 0;
-	bool receivedData;
+	bool finished;
 	//statics
 	static uint64_t encodeGlobID(uint64_t procNo, uint64_t actNo);
 	static std::pair<uint64_t,uint64_t> decodeGlobID(uint64_t inpGlobId);
