@@ -35,6 +35,8 @@ RemoteChannel::RemoteChannel(ActorConnectionType actorConnType, int blockSize, i
     dstID = (double) dest;
     remoteRank = remRank;
 
+    queue_id = 0;
+
     initChannel(remOffset);
 }
 
@@ -69,18 +71,19 @@ std::vector<double> RemoteChannel::pullData()
         std::vector<double> toRet(pullPtr + 3, pullPtr + blockSize);
         //curCapacity++;
         
+        
         pullPtr[0] = 0;
-        gpi_util::wait_if_queue_full (1, 1);
+        gpi_util::wait_for_queue_entries(&queue_id, 1);
         ASSERT (gaspi_write ( 2, 0
                         , remoteRank, 1, remoteOffsets[queueLocation]*sizeof(double)
-                        , sizeof(double), 1, GASPI_BLOCK
+                        , sizeof(double), queue_id, GASPI_BLOCK
                         )
             );//mark as dirty
         
         
         queueLocation++;
         queueLocation %= maxCapacity;
-	    ASSERT (gaspi_wait (1, GASPI_BLOCK));
+	    ASSERT (gaspi_wait (queue_id, GASPI_BLOCK));
         return toRet;
     }
     else
@@ -123,13 +126,13 @@ bool RemoteChannel::isAvailableToPull()
 {
     if(srcID == 1048577)
         gaspi_printf("In availabletopull\n");
-    gpi_util::wait_if_queue_full (2, 1);
+    gpi_util::wait_for_queue_entries(&queue_id, 1);
     ASSERT (gaspi_read ( 2, 0
                         , remoteRank, 1, remoteOffsets[queueLocation]*sizeof(double)
-                        , blockSize * sizeof(double), 2, GASPI_BLOCK
+                        , blockSize * sizeof(double), queue_id, GASPI_BLOCK
                         )
             );
-    ASSERT (gaspi_wait (2, GASPI_BLOCK));
+    ASSERT (gaspi_wait (queue_id, GASPI_BLOCK));
     
 	//gpi_util::wait_for_flush_queues();
     //if(srcID == 2097153)

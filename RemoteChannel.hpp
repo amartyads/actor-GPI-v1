@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include "../local/include/GASPI.h"
+#include "../local/include/GASPI_Ext.h"
 #include "connection-type-util.hpp"
 #include "Channel.hpp"
 
@@ -26,6 +28,7 @@ public:
     bool isSender;
     bool isReceiver;
     int queueLocation;
+    gaspi_queue_id_t queue_id;
 
     void initChannel(uint64_t remOffset);
 
