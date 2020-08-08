@@ -14,7 +14,7 @@ namespace gpi_util
 	{
 		if(ec!=GASPI_SUCCESS)
 		{
-			gaspi_printf("Assertions failed in $s[%i]:%d\n",file,line,ec);
+			gaspi_printf("Assertions failed in %s[%i]:%d\n",file,line,ec);
 			exit(EXIT_FAILURE);
 		}
 	}

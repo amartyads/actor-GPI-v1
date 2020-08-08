@@ -5,7 +5,15 @@ Added
 -iterate through actors
 -remote comms
 -abstract actor
+-gpi queue ring
 
 To add
--gpi queue ring
 -labels to ports
+-arbitrary data?
+-actor dirty mark
+
+operation allocate and free
+in MPI, buffer smaller messages
+segment for offsets? notification
+notify on both read and write
+self triggers

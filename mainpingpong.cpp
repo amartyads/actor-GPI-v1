@@ -41,6 +41,17 @@ int main(int argc, char *argv[])
 	ag.syncActors();
 	ag.printActors();
 
+	int i;
+	for(i = 0; i < num - 1; i++)
+	{
+		ag.pushConnection(Actor::encodeGlobID(i,0), Actor::encodeGlobID(i+1,0));
+	}
+	ag.pushConnection(Actor::encodeGlobID(i,0), Actor::encodeGlobID(i,1));
+	for(; i > 0; i--)
+	{
+		ag.pushConnection(Actor::encodeGlobID(i,1), Actor::encodeGlobID(i-1,1));
+	}
+	/*
 	//ag.pushConnection(0,1);
 	//ag.pushConnection(1,Actor::encodeGlobID(1,0));
 	ag.pushConnection(0,Actor::encodeGlobID(1,0));
@@ -55,11 +66,11 @@ int main(int argc, char *argv[])
 	ag.pushConnection(Actor::encodeGlobID(3,1),Actor::encodeGlobID(2,1));
 	ag.pushConnection(Actor::encodeGlobID(2,1),Actor::encodeGlobID(1,1));
 	ag.pushConnection(Actor::encodeGlobID(1,1),1);
-	
+	*/
+
 	ag.makeConnections();
 
-
-	int i = 0;
+	i = 0;
 	while(! (localActor1->finished && localActor2->finished))// && localActor3->receivedData))
 	//while(i < 7)
 	{

@@ -17,13 +17,13 @@
 #include <cstdlib>
 #include <chrono>
 #include <sstream>
+#include <string>
+#include <vector>
 
 #ifndef ASSERT
 #define ASSERT(ec) gpi_util::success_or_exit(__FILE__,__LINE__,ec)
 #endif
 
-#include <string>
-#include <vector>
 
 ActorGraph::ActorGraph()
 {
@@ -407,7 +407,7 @@ double ActorGraph::run()
 {	
 	//ASSERT (gaspi_barrier (GASPI_GROUP_ALL, GASPI_BLOCK));
 	auto start = std::chrono::steady_clock::now();
-
+	//loop while no more active actors
 	for (int i = 0; i < localActorRefList.size(); i++)
 	{
 		localActorRefList[i]->act();
